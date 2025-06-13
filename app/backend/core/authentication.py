@@ -32,7 +32,7 @@ class AuthError(Exception):
 
 
 class AuthenticationHelper:
-    scope: str = "https://graph.microsoft.com/.default"
+    scope: str = "https://graph.microsoft.us/.default"
 
     def __init__(
         self,
@@ -51,12 +51,12 @@ class AuthenticationHelper:
         self.server_app_secret = server_app_secret
         self.client_app_id = client_app_id
         self.tenant_id = tenant_id
-        self.authority = f"https://login.microsoftonline.com/{tenant_id}"
+        self.authority = f"https://login.microsoftonline.us/{tenant_id}"
         # Depending on if requestedAccessTokenVersion is 1 or 2, the issuer and audience of the token may be different
         # See https://learn.microsoft.com/graph/api/resources/apiapplication
         self.valid_issuers = [
             f"https://sts.windows.net/{tenant_id}/",
-            f"https://login.microsoftonline.com/{tenant_id}/v2.0",
+            f"https://login.microsoftonline.us/{tenant_id}/v2.0",
         ]
         self.valid_audiences = [f"api://{server_app_id}", str(server_app_id)]
         # See https://learn.microsoft.com/entra/identity-platform/access-tokens#validate-the-issuer for more information on token validation
@@ -185,7 +185,7 @@ class AuthenticationHelper:
         async with aiohttp.ClientSession(headers=headers) as session:
             resp_json = None
             resp_status = None
-            async with session.get(url="https://graph.microsoft.com/v1.0/me/transitiveMemberOf?$select=id") as resp:
+            async with session.get(url="https://graph.microsoft.us/v1.0/me/transitiveMemberOf?$select=id") as resp:
                 resp_json = await resp.json()
                 resp_status = resp.status
                 if resp_status != 200:
@@ -221,7 +221,7 @@ class AuthenticationHelper:
             # Use the on-behalf-of-flow to acquire another token for use with Microsoft Graph
             # See https://learn.microsoft.com/entra/identity-platform/v2-oauth2-on-behalf-of-flow for more information
             graph_resource_access_token = self.confidential_client.acquire_token_on_behalf_of(
-                user_assertion=auth_token, scopes=["https://graph.microsoft.com/.default"]
+                user_assertion=auth_token, scopes=["https://graph.microsoft.us/.default"]
             )
             if "error" in graph_resource_access_token:
                 raise AuthError(error=str(graph_resource_access_token), status_code=401)

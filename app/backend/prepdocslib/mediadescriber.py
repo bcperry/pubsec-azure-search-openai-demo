@@ -3,7 +3,7 @@ from abc import ABC
 
 import aiohttp
 from azure.core.credentials_async import AsyncTokenCredential
-from azure.identity.aio import get_bearer_token_provider
+from azure.identity import get_bearer_token_provider
 from rich.progress import Progress
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
 
@@ -60,7 +60,7 @@ class ContentUnderstandingDescriber:
     async def create_analyzer(self):
         logger.info("Creating analyzer '%s'...", self.analyzer_schema["analyzerId"])
 
-        token_provider = get_bearer_token_provider(self.credential, "https://cognitiveservices.azure.com/.default")
+        token_provider = get_bearer_token_provider(self.credential, "https://cognitiveservices.azure.us/.default")
         token = await token_provider()
         headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
         params = {"api-version": self.CU_API_VERSION}
@@ -86,7 +86,7 @@ class ContentUnderstandingDescriber:
     async def describe_image(self, image_bytes: bytes) -> str:
         logger.info("Sending image to Azure Content Understanding service...")
         async with aiohttp.ClientSession() as session:
-            token = await self.credential.get_token("https://cognitiveservices.azure.com/.default")
+            token = await self.credential.get_token("https://cognitiveservices.azure.us/.default")
             headers = {"Authorization": "Bearer " + token.token}
             params = {"api-version": self.CU_API_VERSION}
             analyzer_name = self.analyzer_schema["analyzerId"]

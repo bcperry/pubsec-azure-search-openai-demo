@@ -39,13 +39,20 @@ class SearchInfo:
         self.azure_openai_endpoint = azure_openai_endpoint
 
     def create_search_client(self) -> SearchClient:
-        return SearchClient(endpoint=self.endpoint, index_name=self.index_name, credential=self.credential)
+        return SearchClient(endpoint=self.endpoint, 
+                            index_name=self.index_name, 
+                            credential=self.credential,
+                            audience="https://search.azure.us")
 
     def create_search_index_client(self) -> SearchIndexClient:
-        return SearchIndexClient(endpoint=self.endpoint, credential=self.credential)
+        return SearchIndexClient(endpoint=self.endpoint, 
+                                credential=self.credential,
+                                audience="https://search.azure.us")
 
     def create_search_indexer_client(self) -> SearchIndexerClient:
-        return SearchIndexerClient(endpoint=self.endpoint, credential=self.credential)
+        return SearchIndexerClient(endpoint=self.endpoint, 
+                                   credential=self.credential,
+                                   audience="https://search.azure.us")
 
 
 class DocumentAction(Enum):

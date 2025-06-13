@@ -1,7 +1,8 @@
 import asyncio
 import os
 
-from azure.identity.aio import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 from msgraph import GraphServiceClient
 from msgraph.generated.models.application import Application
 from msgraph.generated.models.public_client_application import PublicClientApplication
@@ -17,9 +18,9 @@ async def main():
         exit(0)
 
     auth_tenant = os.getenv("AZURE_AUTH_TENANT_ID", os.environ["AZURE_TENANT_ID"])
-    credential = AzureDeveloperCliCredential(tenant_id=auth_tenant)
+    credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=auth_tenant)
 
-    scopes = ["https://graph.microsoft.com/.default"]
+    scopes = ["https://graph.microsoft.us/.default"]
     graph_client = GraphServiceClient(credentials=credential, scopes=scopes)
 
     uri = os.getenv("BACKEND_URI")

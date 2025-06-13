@@ -30,7 +30,7 @@ from .mocks import (
 @pytest.fixture
 def search_info():
     return SearchInfo(
-        endpoint="https://testsearchclient.blob.core.windows.net",
+        endpoint="https://testsearchclient.blob.core.usgovcloudapi.net",
         credential=AzureKeyCredential("test"),
         index_name="test",
     )

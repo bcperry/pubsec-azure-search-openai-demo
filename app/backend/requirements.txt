@@ -160,6 +160,7 @@ markupsafe==2.1.5
     #   jinja2
     #   quart
     #   werkzeug
+setuptools
 mdurl==0.1.2
     # via markdown-it-py
 microsoft-kiota-abstractions==1.9.3

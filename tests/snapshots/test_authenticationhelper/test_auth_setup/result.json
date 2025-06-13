@@ -5,7 +5,7 @@
     "msalConfig": {
         "auth": {
             "clientId": "CLIENT_APP",
-            "authority": "https://login.microsoftonline.com/TENANT_ID",
+            "authority": "https://login.microsoftonline.us/TENANT_ID",
             "redirectUri": "/redirect",
             "postLogoutRedirectUri": "/",
             "navigateToLoginRequestUrl": false

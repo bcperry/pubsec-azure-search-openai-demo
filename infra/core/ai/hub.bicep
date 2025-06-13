@@ -60,7 +60,7 @@ resource hub 'Microsoft.MachineLearningServices/workspaces@2024-07-01-preview' =
         category: 'CognitiveSearch'
         authType: 'ApiKey'
         isSharedToAll: true
-        target: 'https://${search.name}.search.windows.net/'
+        target: 'https://${search.name}.search.azure.us/'
         credentials: {
           key: !empty(aiSearchName) ? search.listAdminKeys().primaryKey : ''
         }

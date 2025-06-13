@@ -5,7 +5,8 @@ import os
 import pathlib
 import re
 
-from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import AzureAuthorityHosts
 from azure.search.documents import SearchClient
 from dotenv_azd import load_azd_env
 from langchain_core.documents import Document as LCDocument
@@ -25,19 +26,20 @@ root_dir = pathlib.Path(__file__).parent
 def get_azure_credential():
     AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
     if AZURE_TENANT_ID:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential with tenant_id %s", AZURE_TENANT_ID)
-        azure_credential = AzureDeveloperCliCredential(tenant_id=AZURE_TENANT_ID, process_timeout=60)
+        logger.info("Setting up Azure credential using DefaultAzureCredential with tenant_id %s", AZURE_TENANT_ID)
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential for home tenant")
-        azure_credential = AzureDeveloperCliCredential(process_timeout=60)
+        logger.info("Setting up Azure credential using DefaultAzureCredential for home tenant")
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, process_timeout=60)
     return azure_credential
 
 
 def get_search_documents(azure_credential, num_search_documents=None) -> str:
     search_client = SearchClient(
-        endpoint=f"https://{os.getenv('AZURE_SEARCH_SERVICE')}.search.windows.net",
+        endpoint=f"https://{os.getenv('AZURE_SEARCH_SERVICE')}.search.azure.us",
         index_name=os.getenv("AZURE_SEARCH_INDEX"),
         credential=azure_credential,
+        audience="https://search.azure.us"
     )
     all_documents = []
     if num_search_documents is None:
@@ -55,9 +57,9 @@ def get_search_documents(azure_credential, num_search_documents=None) -> str:
 def generate_ground_truth_ragas(num_questions=200, num_search_documents=None, kg_file=None):
     azure_credential = get_azure_credential()
     azure_openai_api_version = os.getenv("AZURE_OPENAI_API_VERSION") or "2024-06-01"
-    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.com"
+    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.us"
     azure_ad_token_provider = get_bearer_token_provider(
-        azure_credential, "https://cognitiveservices.azure.com/.default"
+        azure_credential, "https://cognitiveservices.azure.us/.default"
     )
     generator_llm = LangchainLLMWrapper(
         AzureChatOpenAI(

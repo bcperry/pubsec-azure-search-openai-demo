@@ -68,7 +68,7 @@ async def test_content_file(monkeypatch, mock_env, mock_acs_search):
 
     # Then we can plug this into any SDK via kwargs:
     blob_client = BlobServiceClient(
-        f"https://{os.environ['AZURE_STORAGE_ACCOUNT']}.blob.core.windows.net",
+        f"https://{os.environ['AZURE_STORAGE_ACCOUNT']}.blob.core.usgovcloudapi.net",
         credential=MockAzureCredential(),
         transport=MockTransport(),
         retry_total=0,  # Necessary to avoid unnecessary network requests during tests

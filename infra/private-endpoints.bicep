@@ -68,8 +68,8 @@ module privateEndpoints './core/networking/private-endpoint.bicep' = [for privat
 // https://learn.microsoft.com/azure/azure-monitor/logs/private-link-configure#review-your-endpoints-dns-settings
 var monitorDnsZoneNames = [
   'privatelink.monitor.azure.com'
-  'privatelink.oms.opinsights.azure.com'
-  'privatelink.ods.opinsights.azure.com'
+  'privatelink.oms.opinsights.azure.us'
+  'privatelink.ods.opinsights.azure.us'
   'privatelink.agentsvc.azure.automation.net'
 ]
 module monitorDnsZones './core/networking/private-dns-zones.bicep' = [for monitorDnsZoneName in monitorDnsZoneNames: {

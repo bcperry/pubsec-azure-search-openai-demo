@@ -4,7 +4,8 @@ import os
 import re
 from pathlib import Path
 
-from azure.identity import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 from dotenv_azd import load_azd_env
 from evaltools.eval.evaluate import run_evaluate_from_config
 from evaltools.eval.evaluate_metrics import register_metric
@@ -65,7 +66,7 @@ class CitationsMatchedMetric(BaseMetric):
 
 
 def get_openai_config():
-    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.com"
+    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.us"
     azure_deployment = os.environ["AZURE_OPENAI_EVAL_DEPLOYMENT"]
     openai_config = {"azure_endpoint": azure_endpoint, "azure_deployment": azure_deployment}
     # azure-ai-evaluate will call DefaultAzureCredential behind the scenes,
@@ -76,11 +77,11 @@ def get_openai_config():
 def get_azure_credential():
     AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
     if AZURE_TENANT_ID:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential with tenant_id %s", AZURE_TENANT_ID)
-        azure_credential = AzureDeveloperCliCredential(tenant_id=AZURE_TENANT_ID, process_timeout=60)
+        logger.info("Setting up Azure credential using DefaultAzureCredential with tenant_id %s", AZURE_TENANT_ID)
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential for home tenant")
-        azure_credential = AzureDeveloperCliCredential(process_timeout=60)
+        logger.info("Setting up Azure credential using DefaultAzureCredential for home tenant")
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, process_timeout=60)
     return azure_credential
 
 

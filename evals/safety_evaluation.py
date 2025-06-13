@@ -13,7 +13,8 @@ from azure.ai.evaluation.simulator import (
     AdversarialSimulator,
     SupportedLanguages,
 )
-from azure.identity import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 from dotenv_azd import load_azd_env
 from rich.logging import RichHandler
 from rich.progress import track
@@ -38,11 +39,11 @@ class HarmSeverityLevel(Enum):
 def get_azure_credential():
     AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
     if AZURE_TENANT_ID:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential with tenant_id %s", AZURE_TENANT_ID)
-        azure_credential = AzureDeveloperCliCredential(tenant_id=AZURE_TENANT_ID, process_timeout=60)
+        logger.info("Setting up Azure credential using DefaultAzureCredential with tenant_id %s", AZURE_TENANT_ID)
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
-        logger.info("Setting up Azure credential using AzureDeveloperCliCredential for home tenant")
-        azure_credential = AzureDeveloperCliCredential(process_timeout=60)
+        logger.info("Setting up Azure credential using DefaultAzureCredential for home tenant")
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, process_timeout=60)
     return azure_credential
 
 

@@ -105,6 +105,8 @@ param chatHistoryVersion string = 'cosmosdb-v2'
   'westeurope'
   'westus'
   'westus3'
+  'usgovarizona'
+  'usgovvirginia'
 ])
 @metadata({
   azd: {
@@ -125,7 +127,7 @@ param documentIntelligenceResourceGroupName string = '' // Set in main.parameter
 // Limited regions for new version:
 // https://learn.microsoft.com/azure/ai-services/document-intelligence/concept-layout
 @description('Location for the Document Intelligence resource group')
-@allowed(['eastus', 'westus2', 'westeurope'])
+@allowed(['eastus', 'westus2', 'westeurope',  'usgovarizona',  'usgovvirginia'])
 @metadata({
   azd: {
     type: 'location'
@@ -150,8 +152,8 @@ param chatGptDeploymentSkuName string = ''
 param chatGptDeploymentCapacity int = 0
 
 var chatGpt = {
-  modelName: !empty(chatGptModelName) ? chatGptModelName : 'gpt-4.1-mini'
-  deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'gpt-4.1-mini'
+  modelName: !empty(chatGptModelName) ? chatGptModelName : 'thisone'
+  deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'thatone'
   deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : '2025-04-14'
   deploymentSkuName: !empty(chatGptDeploymentSkuName) ? chatGptDeploymentSkuName : 'GlobalStandard'
   deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 30
@@ -204,7 +206,7 @@ param searchAgentModelVersion string = ''
 param searchAgentDeploymentSkuName string = ''
 param searchAgentDeploymentCapacity int = 0
 var searchAgent = {
-  modelName: !empty(searchAgentModelName) ? searchAgentModelName : 'gpt-4.1-mini'
+  modelName: !empty(searchAgentModelName) ? searchAgentModelName : 'theotherone'
   deploymentName: !empty(searchAgentDeploymentName) ? searchAgentDeploymentName : 'searchagent'
   deploymentVersion: !empty(searchAgentModelVersion) ? searchAgentModelVersion : '2025-04-14'
   deploymentSkuName: !empty(searchAgentDeploymentSkuName) ? searchAgentDeploymentSkuName : 'GlobalStandard'
@@ -307,7 +309,7 @@ param containerRegistryName string = deploymentTarget == 'containerapps'
 
 // Configure CORS for allowing different web apps to use the backend
 // For more information please see https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-var msftAllowedOrigins = [ 'https://portal.azure.com', 'https://ms.portal.azure.com' ]
+var msftAllowedOrigins = [ 'https://portal.azure.com', 'https://ms.portal.azure.com', 'https://portal.azure.us', 'https://ms.portal.azure.us' ]
 var loginEndpoint = environment().authentication.loginEndpoint
 var loginEndpointFixed = lastIndexOf(loginEndpoint, '/') == length(loginEndpoint) - 1 ? substring(loginEndpoint, 0, length(loginEndpoint) - 1) : loginEndpoint
 var allMsftAllowedOrigins = !(empty(clientAppId)) ? union(msftAllowedOrigins, [ loginEndpointFixed ]) : msftAllowedOrigins
@@ -1176,7 +1178,7 @@ var openAiPrivateEndpointConnection = (isAzureOpenAiHost && deployAzureOpenAi &&
   ? [
       {
         groupId: 'account'
-        dnsZoneName: 'privatelink.openai.azure.com'
+        dnsZoneName: 'privatelink.openai.azure.us'
         resourceIds: concat(
           [openAi.outputs.resourceId],
           useGPT4V ? [computerVision.outputs.resourceId] : [],
@@ -1195,17 +1197,17 @@ var otherPrivateEndpointConnections = (usePrivateEndpoint && deploymentTarget ==
       }
       {
         groupId: 'searchService'
-        dnsZoneName: 'privatelink.search.windows.net'
+        dnsZoneName: 'privatelink.search.azure.us'
         resourceIds: [searchService.outputs.id]
       }
       {
         groupId: 'sites'
-        dnsZoneName: 'privatelink.azurewebsites.net'
+        dnsZoneName: 'privatelink.azurewebsites.us'
         resourceIds: [backend.outputs.id]
       }
       {
         groupId: 'sql'
-        dnsZoneName: 'privatelink.documents.azure.com'
+        dnsZoneName: 'privatelink.documents.azure.us	'
         resourceIds: (useAuthentication && useChatHistoryCosmos) ? [cosmosDb.outputs.resourceId] : []
       }
     ]

@@ -6,7 +6,9 @@ from typing import Optional, Union
 
 from azure.core.credentials import AzureKeyCredential
 from azure.core.credentials_async import AsyncTokenCredential
-from azure.identity.aio import AzureDeveloperCliCredential, get_bearer_token_provider
+from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+from azure.identity import AzureAuthorityHosts
+
 from rich.logging import RichHandler
 
 from load_azd_env import load_azd_env
@@ -64,7 +66,7 @@ async def setup_search_info(
         raise ValueError("Azure OpenAI SearchAgent model must be specified when using agentic retrieval.")
 
     return SearchInfo(
-        endpoint=f"https://{search_service}.search.windows.net/",
+        endpoint=f"https://{search_service}.search.azure.us/",
         credential=search_creds,
         index_name=index_name,
         agent_name=agent_name,
@@ -87,7 +89,7 @@ def setup_blob_manager(
 ):
     storage_creds: Union[AsyncTokenCredential, str] = azure_credential if storage_key is None else storage_key
     return BlobManager(
-        endpoint=f"https://{storage_account}.blob.core.windows.net",
+        endpoint=f"https://{storage_account}.blob.core.usgovcloudapi.net",
         container=storage_container,
         account=storage_account,
         credential=storage_creds,
@@ -188,7 +190,7 @@ def setup_file_processors(
             azure_credential if document_intelligence_key is None else AzureKeyCredential(document_intelligence_key)
         )
         doc_int_parser = DocumentAnalysisParser(
-            endpoint=f"https://{document_intelligence_service}.cognitiveservices.azure.com/",
+            endpoint=f"https://{document_intelligence_service}.cognitiveservices.azure.us/",
             credential=documentintelligence_creds,
             use_content_understanding=use_content_understanding,
             content_understanding_endpoint=content_understanding_endpoint,
@@ -249,7 +251,7 @@ def setup_image_embeddings_service(
             raise ValueError("A computer vision endpoint is required when GPT-4-vision is enabled.")
         image_embeddings_service = ImageEmbeddings(
             endpoint=vision_endpoint,
-            token_provider=get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.com/.default"),
+            token_provider=get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.us/.default"),
         )
     return image_embeddings_service
 
@@ -335,12 +337,12 @@ if __name__ == "__main__":
     use_content_understanding = os.getenv("USE_MEDIA_DESCRIBER_AZURE_CU", "").lower() == "true"
 
     # Use the current user identity to connect to Azure services. See infra/main.bicep for role assignments.
-    if tenant_id := os.getenv("AZURE_TENANT_ID"):
-        logger.info("Connecting to Azure services using the azd credential for tenant %s", tenant_id)
-        azd_credential = AzureDeveloperCliCredential(tenant_id=tenant_id, process_timeout=60)
-    else:
-        logger.info("Connecting to Azure services using the azd credential for home tenant")
-        azd_credential = AzureDeveloperCliCredential(process_timeout=60)
+    # if tenant_id := os.getenv("AZURE_TENANT_ID"):
+    #     logger.info("Connecting to Azure services using the azd credential for tenant %s", tenant_id)
+    #     azd_credential = DefaultAzureCredential(tenant_id=tenant_id, process_timeout=60, authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+    # else:
+    logger.info("Connecting to Azure services using the azd credential for home tenant")
+    azd_credential = DefaultAzureCredential(process_timeout=60, authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
 
     if args.removeall:
         document_action = DocumentAction.RemoveAll

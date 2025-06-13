@@ -27,7 +27,7 @@ param containerAppsEnvironmentName string = '${containerName}env'
 param containerRegistryName string
 
 @description('Hostname suffix for container registry. Set when deploying to sovereign clouds')
-param containerRegistryHostSuffix string = 'azurecr.io'
+param containerRegistryHostSuffix string = 'azurecr.us'
 
 @allowed(['http', 'grpc'])
 @description('The protocol used by Dapr to connect to the app, e.g., HTTP or gRPC')

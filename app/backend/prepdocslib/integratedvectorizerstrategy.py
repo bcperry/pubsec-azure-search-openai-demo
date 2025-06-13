@@ -87,7 +87,7 @@ class IntegratedVectorizerStrategy(Strategy):
             name="embedding-skill",
             description="Skill to generate embeddings via Azure OpenAI",
             context="/document/pages/*",
-            resource_url=f"https://{self.embeddings.open_ai_service}.openai.azure.com",
+            resource_url=f"https://{self.embeddings.open_ai_service}.openai.azure.us",
             deployment_name=self.embeddings.open_ai_deployment,
             model_name=self.embeddings.open_ai_model_name,
             dimensions=self.embeddings.open_ai_dimensions,

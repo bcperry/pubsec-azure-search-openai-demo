@@ -8,7 +8,8 @@ from urllib.parse import urljoin
 
 from azure.core.credentials import AzureKeyCredential
 from azure.core.credentials_async import AsyncTokenCredential
-from azure.identity.aio import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.indexes.aio import SearchIndexClient
 from azure.search.documents.indexes.models import (
@@ -65,7 +66,7 @@ class ManageAcl:
         self.acl = acl
 
     async def run(self):
-        endpoint = f"https://{self.service_name}.search.windows.net"
+        endpoint = f"https://{self.service_name}.search.azure.us"
         if self.acl_action == "enable_acls":
             await self.enable_acls(endpoint)
             return
@@ -209,9 +210,9 @@ async def main(args: Any):
 
     # Use the current user identity to connect to Azure services unless a key is explicitly set for any of them
     azd_credential = (
-        AzureDeveloperCliCredential()
+        DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
         if args.tenant_id is None
-        else AzureDeveloperCliCredential(tenant_id=args.tenant_id, process_timeout=60)
+        else DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=args.tenant_id, process_timeout=60)
     )
     search_credential: Union[AsyncTokenCredential, AzureKeyCredential] = azd_credential
     if args.search_key is not None:

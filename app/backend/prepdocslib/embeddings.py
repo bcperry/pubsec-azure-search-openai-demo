@@ -8,7 +8,7 @@ import aiohttp
 import tiktoken
 from azure.core.credentials import AzureKeyCredential
 from azure.core.credentials_async import AsyncTokenCredential
-from azure.identity.aio import get_bearer_token_provider
+from azure.identity import get_bearer_token_provider
 from openai import AsyncAzureOpenAI, AsyncOpenAI, RateLimitError
 from tenacity import (
     AsyncRetrying,
@@ -172,7 +172,7 @@ class AzureOpenAIEmbeddingService(OpenAIEmbeddings):
         super().__init__(open_ai_model_name, open_ai_dimensions, disable_batch)
         self.open_ai_service = open_ai_service
         if open_ai_service:
-            self.open_ai_endpoint = f"https://{open_ai_service}.openai.azure.com"
+            self.open_ai_endpoint = f"https://{open_ai_service}.openai.azure.us"
         elif open_ai_custom_url:
             self.open_ai_endpoint = open_ai_custom_url
         else:
@@ -191,7 +191,7 @@ class AzureOpenAIEmbeddingService(OpenAIEmbeddings):
             auth_args["api_key"] = self.credential.key
         elif isinstance(self.credential, AsyncTokenCredential):
             auth_args["azure_ad_token_provider"] = get_bearer_token_provider(
-                self.credential, "https://cognitiveservices.azure.com/.default"
+                self.credential, "https://cognitiveservices.azure.us/.default"
             )
         else:
             raise TypeError("Invalid credential type")

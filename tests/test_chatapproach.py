@@ -179,7 +179,7 @@ async def test_search_results_filtering_by_scores(
 ):
 
     chat_approach = ChatReadRetrieveReadApproach(
-        search_client=SearchClient(endpoint="", index_name="", credential=AzureKeyCredential("")),
+        search_client=SearchClient(endpoint="", index_name="", credential=AzureKeyCredential(""), audience="https://search.azure.us"),
         search_index_name=None,
         agent_model=None,
         agent_deployment=None,
@@ -222,7 +222,7 @@ async def test_search_results_filtering_by_scores(
 @pytest.mark.asyncio
 async def test_search_results_query_rewriting(monkeypatch):
     chat_approach = ChatReadRetrieveReadApproach(
-        search_client=SearchClient(endpoint="", index_name="", credential=AzureKeyCredential("")),
+        search_client=SearchClient(endpoint="", index_name="", credential=AzureKeyCredential(""), audience="https://search.azure.us"),
         search_index_name=None,
         agent_model=None,
         agent_deployment=None,

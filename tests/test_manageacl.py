@@ -32,7 +32,7 @@ class AsyncSearchResultsIterator:
 @pytest.mark.asyncio
 async def test_view_acl(monkeypatch, capsys):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.windows.net/content/a.txt'"
+        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.usgovcloudapi.net/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator([{"oids": ["OID_ACL"]}])
 
@@ -41,7 +41,7 @@ async def test_view_acl(monkeypatch, capsys):
     command = ManageAcl(
         service_name="SERVICE",
         index_name="INDEX",
-        url="https://test.blob.core.windows.net/content/a.txt",
+        url="https://test.blob.core.usgovcloudapi.net/content/a.txt",
         acl_action="view",
         acl_type="oids",
         acl="",
@@ -55,7 +55,7 @@ async def test_view_acl(monkeypatch, capsys):
 @pytest.mark.asyncio
 async def test_remove_acl(monkeypatch, capsys):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.windows.net/content/a.txt'"
+        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.usgovcloudapi.net/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator(
             [
@@ -76,7 +76,7 @@ async def test_remove_acl(monkeypatch, capsys):
     command = ManageAcl(
         service_name="SERVICE",
         index_name="INDEX",
-        url="https://test.blob.core.windows.net/content/a.txt",
+        url="https://test.blob.core.usgovcloudapi.net/content/a.txt",
         acl_action="remove",
         acl_type="oids",
         acl="OID_ACL_TO_REMOVE",
@@ -89,7 +89,7 @@ async def test_remove_acl(monkeypatch, capsys):
 @pytest.mark.asyncio
 async def test_remove_all_acl(monkeypatch, capsys):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.windows.net/content/a.txt'"
+        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.usgovcloudapi.net/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator(
             [
@@ -110,7 +110,7 @@ async def test_remove_all_acl(monkeypatch, capsys):
     command = ManageAcl(
         service_name="SERVICE",
         index_name="INDEX",
-        url="https://test.blob.core.windows.net/content/a.txt",
+        url="https://test.blob.core.usgovcloudapi.net/content/a.txt",
         acl_action="remove_all",
         acl_type="oids",
         acl="",
@@ -123,7 +123,7 @@ async def test_remove_all_acl(monkeypatch, capsys):
 @pytest.mark.asyncio
 async def test_add_acl(monkeypatch, caplog):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.windows.net/content/a.txt'"
+        assert kwargs.get("filter") == "storageUrl eq 'https://test.blob.core.usgovcloudapi.net/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator([{"id": 1, "oids": ["OID_EXISTS"]}, {"id": 2, "oids": ["OID_EXISTS"]}])
 
@@ -139,7 +139,7 @@ async def test_add_acl(monkeypatch, caplog):
     command = ManageAcl(
         service_name="SERVICE",
         index_name="INDEX",
-        url="https://test.blob.core.windows.net/content/a.txt",
+        url="https://test.blob.core.usgovcloudapi.net/content/a.txt",
         acl_action="add",
         acl_type="oids",
         acl="OID_EXISTS",
@@ -156,7 +156,7 @@ async def test_add_acl(monkeypatch, caplog):
     command = ManageAcl(
         service_name="SERVICE",
         index_name="INDEX",
-        url="https://test.blob.core.windows.net/content/a.txt",
+        url="https://test.blob.core.usgovcloudapi.net/content/a.txt",
         acl_action="add",
         acl_type="oids",
         acl="OID_ADD",
@@ -195,7 +195,7 @@ async def test_update_storage_urls(monkeypatch, caplog):
     command = ManageAcl(
         service_name="SERVICE",
         index_name="INDEX",
-        url="https://test.blob.core.windows.net/content/",
+        url="https://test.blob.core.usgovcloudapi.net/content/",
         acl_action="update_storage_urls",
         acl_type="",
         acl="",
@@ -203,9 +203,9 @@ async def test_update_storage_urls(monkeypatch, caplog):
     )
     with caplog.at_level(logging.INFO):
         await command.run()
-        assert merged_documents == [{"id": 2, "storageUrl": "https://test.blob.core.windows.net/content/ab.txt"}]
+        assert merged_documents == [{"id": 2, "storageUrl": "https://test.blob.core.usgovcloudapi.net/content/ab.txt"}]
         assert "Not updating storage URL of document 1 as it has only one oid and may be user uploaded" in caplog.text
-        assert "Adding storage URL https://test.blob.core.windows.net/content/ab.txt for document 2" in caplog.text
+        assert "Adding storage URL https://test.blob.core.usgovcloudapi.net/content/ab.txt for document 2" in caplog.text
         assert "Updating storage URL for 1 search documents" in caplog.text
 
 

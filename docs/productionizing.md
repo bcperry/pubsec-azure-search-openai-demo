@@ -114,7 +114,7 @@ locust ChatUser
 
 Open the locust UI at [http://localhost:8089/](http://localhost:8089/), the URI displayed in the terminal.
 
-Start a new test with the URI of your website, e.g. `https://my-chat-app.azurewebsites.net`.
+Start a new test with the URI of your website, e.g. `https://my-chat-app.azurewebsites.us`.
 Do *not* end the URI with a slash. You can start by pointing at your localhost if you're concerned
 more about load on OpenAI/AI Search than the host platform.
 

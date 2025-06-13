@@ -17,11 +17,12 @@ from azure.cognitiveservices.speech import (
     SpeechSynthesizer,
 )
 from azure.core.exceptions import ResourceNotFoundError
-from azure.identity.aio import (
-    AzureDeveloperCliCredential,
+from azure.identity import (
+    DefaultAzureCredential,
     ManagedIdentityCredential,
     get_bearer_token_provider,
 )
+from azure.identity import AzureAuthorityHosts
 from azure.monitor.opentelemetry import configure_azure_monitor
 from azure.search.documents.agent.aio import KnowledgeAgentRetrievalClient
 from azure.search.documents.aio import SearchClient
@@ -324,7 +325,7 @@ async def speech():
     speech_token = current_app.config.get(CONFIG_SPEECH_SERVICE_TOKEN)
     if speech_token is None or speech_token.expires_on < time.time() + 60:
         speech_token = await current_app.config[CONFIG_CREDENTIAL].get_token(
-            "https://cognitiveservices.azure.com/.default"
+            "https://cognitiveservices.azure.us/.default"
         )
         current_app.config[CONFIG_SPEECH_SERVICE_TOKEN] = speech_token
 
@@ -428,7 +429,7 @@ async def setup_clients():
     AZURE_USERSTORAGE_ACCOUNT = os.environ.get("AZURE_USERSTORAGE_ACCOUNT")
     AZURE_USERSTORAGE_CONTAINER = os.environ.get("AZURE_USERSTORAGE_CONTAINER")
     AZURE_SEARCH_SERVICE = os.environ["AZURE_SEARCH_SERVICE"]
-    AZURE_SEARCH_ENDPOINT = f"https://{AZURE_SEARCH_SERVICE}.search.windows.net"
+    AZURE_SEARCH_ENDPOINT = f"https://{AZURE_SEARCH_SERVICE}.search.azure.us"
     AZURE_SEARCH_INDEX = os.environ["AZURE_SEARCH_INDEX"]
     AZURE_SEARCH_AGENT = os.getenv("AZURE_SEARCH_AGENT", "")
     # Shared by all OpenAI deployments
@@ -495,7 +496,7 @@ async def setup_clients():
     # Use the current user identity for keyless authentication to Azure services.
     # This assumes you use 'azd auth login' locally, and managed identity when deployed on Azure.
     # The managed identity is setup in the infra/ folder.
-    azure_credential: Union[AzureDeveloperCliCredential, ManagedIdentityCredential]
+    # azure_credential: Union[DefaultAzureCredential, ManagedIdentityCredential]
     if RUNNING_ON_AZURE:
         current_app.logger.info("Setting up Azure credential using ManagedIdentityCredential")
         if AZURE_CLIENT_ID := os.getenv("AZURE_CLIENT_ID"):
@@ -504,18 +505,18 @@ async def setup_clients():
             current_app.logger.info(
                 "Setting up Azure credential using ManagedIdentityCredential with client_id %s", AZURE_CLIENT_ID
             )
-            azure_credential = ManagedIdentityCredential(client_id=AZURE_CLIENT_ID)
+            azure_credential = ManagedIdentityCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, client_id=AZURE_CLIENT_ID)
         else:
             current_app.logger.info("Setting up Azure credential using ManagedIdentityCredential")
-            azure_credential = ManagedIdentityCredential()
-    elif AZURE_TENANT_ID:
-        current_app.logger.info(
-            "Setting up Azure credential using AzureDeveloperCliCredential with tenant_id %s", AZURE_TENANT_ID
-        )
-        azure_credential = AzureDeveloperCliCredential(tenant_id=AZURE_TENANT_ID, process_timeout=60)
+            azure_credential = ManagedIdentityCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+    # elif AZURE_TENANT_ID:
+    #     current_app.logger.info(
+    #         "Setting up Azure credential using DefaultAzureCredential with tenant_id %s", AZURE_TENANT_ID
+    #     )
+    #     azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
-        current_app.logger.info("Setting up Azure credential using AzureDeveloperCliCredential for home tenant")
-        azure_credential = AzureDeveloperCliCredential(process_timeout=60)
+        current_app.logger.info("Setting up Azure credential using DefaultAzureCredential for home tenant")
+        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, process_timeout=60)
 
     # Set the Azure credential in the app config for use in other parts of the app
     current_app.config[CONFIG_CREDENTIAL] = azure_credential
@@ -525,13 +526,17 @@ async def setup_clients():
         endpoint=AZURE_SEARCH_ENDPOINT,
         index_name=AZURE_SEARCH_INDEX,
         credential=azure_credential,
+        audience="https://search.azure.us"
     )
     agent_client = KnowledgeAgentRetrievalClient(
-        endpoint=AZURE_SEARCH_ENDPOINT, agent_name=AZURE_SEARCH_AGENT, credential=azure_credential
+        endpoint=AZURE_SEARCH_ENDPOINT, 
+        agent_name=AZURE_SEARCH_AGENT, 
+        credential=azure_credential,
+        audience="https://search.azure.us"
     )
 
     blob_container_client = ContainerClient(
-        f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.windows.net", AZURE_STORAGE_CONTAINER, credential=azure_credential
+        f"https://{AZURE_STORAGE_ACCOUNT}.blob.core.usgovcloudapi.net", AZURE_STORAGE_CONTAINER, credential=azure_credential
     )
 
     # Set up authentication helper
@@ -541,6 +546,7 @@ async def setup_clients():
         search_index_client = SearchIndexClient(
             endpoint=AZURE_SEARCH_ENDPOINT,
             credential=azure_credential,
+            audience="https://search.azure.us"
         )
         search_index = await search_index_client.get_index(AZURE_SEARCH_INDEX)
         await search_index_client.close()
@@ -626,7 +632,7 @@ async def setup_clients():
             current_app.logger.info("OPENAI_HOST is azure, setting up Azure OpenAI client")
             if not AZURE_OPENAI_SERVICE:
                 raise ValueError("AZURE_OPENAI_SERVICE must be set when OPENAI_HOST is azure")
-            endpoint = f"https://{AZURE_OPENAI_SERVICE}.openai.azure.com"
+            endpoint = f"https://{AZURE_OPENAI_SERVICE}.openai.azure.us"
         if api_key := os.getenv("AZURE_OPENAI_API_KEY_OVERRIDE"):
             current_app.logger.info("AZURE_OPENAI_API_KEY_OVERRIDE found, using as api_key for Azure OpenAI client")
             openai_client = AsyncAzureOpenAI(
@@ -634,7 +640,7 @@ async def setup_clients():
             )
         else:
             current_app.logger.info("Using Azure credential (passwordless authentication) for Azure OpenAI client")
-            token_provider = get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.com/.default")
+            token_provider = get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.us/.default")
             openai_client = AsyncAzureOpenAI(
                 api_version=AZURE_OPENAI_API_VERSION,
                 azure_endpoint=endpoint,
@@ -749,7 +755,7 @@ async def setup_clients():
                 "AZURE_OPENAI_CHATGPT_MODEL and AZURE_OPENAI_GPT4V_MODEL must not be a reasoning model when USE_GPT4V is true"
             )
 
-        token_provider = get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.com/.default")
+        token_provider = get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.us/.default")
 
         current_app.config[CONFIG_ASK_VISION_APPROACH] = RetrieveThenReadVisionApproach(
             search_client=search_client,

@@ -7,7 +7,8 @@ from typing import Any, Optional
 
 import aiohttp
 from azure.core.credentials_async import AsyncTokenCredential
-from azure.identity.aio import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 from azure.storage.filedatalake.aio import (
     DataLakeDirectoryClient,
     DataLakeServiceClient,
@@ -123,12 +124,12 @@ class AdlsGen2Setup:
     async def create_or_get_group(self, group_name: str):
         group_id = None
         if not self.graph_headers:
-            token_result = await self.credentials.get_token("https://graph.microsoft.com/.default")
+            token_result = await self.credentials.get_token("https://graph.microsoft.us/.default")
             self.graph_headers = {"Authorization": f"Bearer {token_result.token}"}
         async with aiohttp.ClientSession(headers=self.graph_headers) as session:
             logger.info(f"Searching for group {group_name}...")
             async with session.get(
-                f"https://graph.microsoft.com/v1.0/groups?$select=id&$top=1&$filter=displayName eq '{group_name}'"
+                f"https://graph.microsoft.us/v1.0/groups?$select=id&$top=1&$filter=displayName eq '{group_name}'"
             ) as response:
                 content = await response.json()
                 if response.status != 200:
@@ -145,7 +146,7 @@ class AdlsGen2Setup:
                     # "mailEnabled": False,
                     # "mailNickname": group_name,
                 }
-                async with session.post("https://graph.microsoft.com/v1.0/groups", json=group) as response:
+                async with session.post("https://graph.microsoft.us/v1.0/groups", json=group) as response:
                     content = await response.json()
                     if response.status != 201:
                         raise Exception(content)
@@ -160,7 +161,7 @@ async def main(args: Any):
     if not os.getenv("AZURE_ADLS_GEN2_STORAGE_ACCOUNT"):
         raise Exception("AZURE_ADLS_GEN2_STORAGE_ACCOUNT must be set to continue")
 
-    async with AzureDeveloperCliCredential() as credentials:
+    async with DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT) as credentials:
         with open(args.data_access_control) as f:
             data_access_control_format = json.load(f)
         command = AdlsGen2Setup(

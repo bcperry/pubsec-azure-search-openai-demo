@@ -17,14 +17,14 @@ async def test_contentunderstanding_analyze(monkeypatch, caplog):
             return MockResponse(
                 status=200,
                 headers={
-                    "Operation-Location": "https://testcontentunderstanding.cognitiveservices.azure.com/contentunderstanding/analyzers/badanalyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
+                    "Operation-Location": "https://testcontentunderstanding.cognitiveservices.azure.us/contentunderstanding/analyzers/badanalyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
                 },
             )
         if kwargs.get("url").endswith("contentunderstanding/analyzers/image_analyzer:analyze"):
             return MockResponse(
                 status=200,
                 headers={
-                    "Operation-Location": "https://testcontentunderstanding.cognitiveservices.azure.com/contentunderstanding/analyzers/image_analyzer/results/53e4c016-d2c0-48a9-a9f4-38891f7d45f0?api-version=2024-12-01-preview"
+                    "Operation-Location": "https://testcontentunderstanding.cognitiveservices.azure.us/contentunderstanding/analyzers/image_analyzer/results/53e4c016-d2c0-48a9-a9f4-38891f7d45f0?api-version=2024-12-01-preview"
                 },
             )
         else:
@@ -70,11 +70,11 @@ async def test_contentunderstanding_analyze(monkeypatch, caplog):
                 ),
             )
         elif url.endswith(
-            "https://testcontentunderstanding.cognitiveservices.azure.com/contentunderstanding/analyzers/badanalyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
+            "https://testcontentunderstanding.cognitiveservices.azure.us/contentunderstanding/analyzers/badanalyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
         ):
             return MockResponse(status=200, text=json.dumps({"status": "Failed"}))
         elif url.endswith(
-            "https://testcontentunderstanding.cognitiveservices.azure.com/contentunderstanding/analyzers/image_analyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
+            "https://testcontentunderstanding.cognitiveservices.azure.us/contentunderstanding/analyzers/image_analyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
         ):
             nonlocal num_poll_calls
             num_poll_calls += 1
@@ -101,7 +101,7 @@ async def test_contentunderstanding_analyze(monkeypatch, caplog):
             return MockResponse(
                 status=201,
                 headers={
-                    "Operation-Location": "https://testcontentunderstanding.cognitiveservices.azure.com/contentunderstanding/analyzers/image_analyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
+                    "Operation-Location": "https://testcontentunderstanding.cognitiveservices.azure.us/contentunderstanding/analyzers/image_analyzer/operations/7f313e00-4da1-4b19-a25e-53f121c24d10?api-version=2024-12-01-preview"
                 },
             )
         else:
@@ -110,26 +110,26 @@ async def test_contentunderstanding_analyze(monkeypatch, caplog):
     monkeypatch.setattr(aiohttp.ClientSession, "put", mock_put)
 
     describer = ContentUnderstandingDescriber(
-        endpoint="https://testcontentunderstanding.cognitiveservices.azure.com", credential=MockAzureCredential()
+        endpoint="https://testcontentunderstanding.cognitiveservices.azure.us", credential=MockAzureCredential()
     )
     await describer.create_analyzer()
     await describer.describe_image(b"imagebytes")
 
     describer_wrong_endpoint = ContentUnderstandingDescriber(
-        endpoint="https://wrongservicename.cognitiveservices.azure.com", credential=MockAzureCredential()
+        endpoint="https://wrongservicename.cognitiveservices.azure.us", credential=MockAzureCredential()
     )
     with pytest.raises(Exception):
         await describer_wrong_endpoint.create_analyzer()
 
     describer_existing_analyzer = ContentUnderstandingDescriber(
-        endpoint="https://existinganalyzer.cognitiveservices.azure.com", credential=MockAzureCredential()
+        endpoint="https://existinganalyzer.cognitiveservices.azure.us", credential=MockAzureCredential()
     )
     with caplog.at_level(logging.INFO):
         await describer_existing_analyzer.create_analyzer()
         assert "Analyzer 'image_analyzer' already exists." in caplog.text
 
     describer_bad_analyze = ContentUnderstandingDescriber(
-        endpoint="https://badanalyzer.cognitiveservices.azure.com", credential=MockAzureCredential()
+        endpoint="https://badanalyzer.cognitiveservices.azure.us", credential=MockAzureCredential()
     )
     with pytest.raises(Exception):
         await describer_bad_analyze.describe_image(b"imagebytes")

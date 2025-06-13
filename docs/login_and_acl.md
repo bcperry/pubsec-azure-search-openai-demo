@@ -180,13 +180,13 @@ The following instructions explain how to setup the two apps using the Azure Por
   - Under **Supported account types**, select **Accounts in this organizational directory only**.
   - Under `Redirect URI (optional)` section, select `Single-page application (SPA)` in the combo-box and enter the following redirect URI:
     - If you are running the sample locally, add the endpoints `http://localhost:50505/redirect` and `http://localhost:5173/redirect`
-    - If you are running the sample on Azure, add the endpoints provided by `azd up`: `https://<your-endpoint>.azurewebsites.net/redirect`.
+    - If you are running the sample on Azure, add the endpoints provided by `azd up`: `https://<your-endpoint>.azurewebsites.us/redirect`.
     - If you are running the sample from Github Codespaces, add the Codespaces endpoint: `https://<your-codespace>-50505.app.github.dev/redirect`
 - Select **Register** to create the application
 - In the app's registration screen, find the **Application (client) ID**.
   - Run the following `azd` command to save this ID: `azd env set AZURE_CLIENT_APP_ID <Application (client) ID>`.
 - In the left hand menu, select **Authentication**.
-  - Under Web, add a redirect URI with the endpoint provided by `azd up`: `https://<your-endpoint>.azurewebsites.net/.auth/login/aad/callback`.
+  - Under Web, add a redirect URI with the endpoint provided by `azd up`: `https://<your-endpoint>.azurewebsites.us/.auth/login/aad/callback`.
   - Under **Implicit grant and hybrid flows**, select **ID Tokens (used for implicit and hybrid flows)**
   - Select **Save**
 - In the left hand menu, select **API permissions**. You will add permission to access the **access_as_user** API on the server app. This permission is required for the [On Behalf Of Flow](https://learn.microsoft.com/entra/identity-platform/v2-oauth2-on-behalf-of-flow#protocol-diagram) to work.
@@ -226,9 +226,10 @@ Get an access token that can be used for calling the chat API using the followin
 
 ```python
 from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 import os
 
-token = DefaultAzureCredential().get_token(f"api://{os.environ['AZURE_SERVER_APP_ID']}/access_as_user", tenant_id=os.getenv('AZURE_AUTH_TENANT_ID', os.getenv('AZURE_TENANT_ID')))
+token = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT).get_token(f"api://{os.environ['AZURE_SERVER_APP_ID']}/access_as_user", tenant_id=os.getenv('AZURE_AUTH_TENANT_ID', os.getenv('AZURE_TENANT_ID')))
 
 print(token.token)
 ```
@@ -272,7 +273,7 @@ The script supports the following commands. All commands support `-v` for verbos
   Example to view all Group IDs:
 
   ```shell
-  python ./scripts/manageacl.py -v --acl-type groups --acl-action view --url https://st12345.blob.core.windows.net/content/Benefit_Options.pdf
+  python ./scripts/manageacl.py -v --acl-type groups --acl-action view --url https://st12345.blob.core.usgovcloudapi.net/content/Benefit_Options.pdf
   ```
 
 - `python ./scripts/manageacl.py --acl-type [oids or groups] --acl-action add --acl [ID of group or user] --url [https://url.pdf]`: Adds an access control value associated with either User IDs or Group IDs for the document at the specified URL.
@@ -280,7 +281,7 @@ The script supports the following commands. All commands support `-v` for verbos
   Example to add a Group ID:
 
   ```shell
-  python ./scripts/manageacl.py -v --acl-type groups --acl-action add --acl xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --url https://st12345.blob.core.windows.net/content/Benefit_Options.pdf
+  python ./scripts/manageacl.py -v --acl-type groups --acl-action add --acl xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --url https://st12345.blob.core.usgovcloudapi.net/content/Benefit_Options.pdf
   ```
 
 - `python ./scripts/manageacl.py --acl-type [oids or groups]--acl-action remove_all --url [https://url.pdf]`: Removes all access control values associated with either User IDs or Group IDs for a specific document.
@@ -288,7 +289,7 @@ The script supports the following commands. All commands support `-v` for verbos
   Example to remove all Group IDs:
 
   ```shell
-  python ./scripts/manageacl.py -v --acl-type groups --acl-action remove_all --url https://st12345.blob.core.windows.net/content/Benefit_Options.pdf
+  python ./scripts/manageacl.py -v --acl-type groups --acl-action remove_all --url https://st12345.blob.core.usgovcloudapi.net/content/Benefit_Options.pdf
   ```
 
 - `python ./scripts/manageacl.py --url [https://url.pdf] --acl-type [oids or groups]--acl-action remove --acl [ID of group or user]`: Removes an access control value associated with either User IDs or Group IDs for a specific document.
@@ -296,7 +297,7 @@ The script supports the following commands. All commands support `-v` for verbos
   Example to remove a specific User ID:
 
   ```shell
-  python ./scripts/manageacl.py -v --acl-type oids --acl-action remove --acl xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --url https://st12345.blob.core.windows.net/content/Benefit_Options.pdf
+  python ./scripts/manageacl.py -v --acl-type oids --acl-action remove --acl xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx --url https://st12345.blob.core.usgovcloudapi.net/content/Benefit_Options.pdf
   ```
 
 ### Azure Data Lake Storage Gen2 Setup

@@ -5,7 +5,8 @@ import random
 import subprocess
 import uuid
 
-from azure.identity.aio import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 from msgraph import GraphServiceClient
 from msgraph.generated.applications.item.add_password.add_password_post_request_body import (
     AddPasswordPostRequestBody,
@@ -191,9 +192,9 @@ async def main():
         )
         exit(1)
     print("Setting up authentication for tenant", auth_tenant)
-    credential = AzureDeveloperCliCredential(tenant_id=auth_tenant)
+    credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=auth_tenant)
 
-    scopes = ["https://graph.microsoft.com/.default"]
+    scopes = ["https://graph.microsoft.us/.default"]
     graph_client = GraphServiceClient(credentials=credential, scopes=scopes)
 
     app_identifier = random_app_identifier()

@@ -30,7 +30,8 @@ response: dict
 import os
 
 from azure.cosmos.aio import CosmosClient
-from azure.identity.aio import AzureDeveloperCliCredential
+from azure.identity import DefaultAzureCredential
+from azure.identity import AzureAuthorityHosts
 
 from load_azd_env import load_azd_env
 
@@ -47,11 +48,11 @@ class CosmosDBMigrator:
         Args:
             cosmos_account: CosmosDB account name
             database_name: Database name
-            credential: Azure credential, defaults to AzureDeveloperCliCredential
+            credential: Azure credential, defaults to DefaultAzureCredential
         """
         self.cosmos_account = cosmos_account
         self.database_name = database_name
-        self.credential = credential or AzureDeveloperCliCredential()
+        self.credential = credential or DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
         self.client = None
         self.database = None
         self.old_container = None
@@ -62,7 +63,7 @@ class CosmosDBMigrator:
         Connect to CosmosDB and initialize containers.
         """
         self.client = CosmosClient(
-            url=f"https://{self.cosmos_account}.documents.azure.com:443/", credential=self.credential
+            url=f"https://{self.cosmos_account}.documents.azure.us	:443/", credential=self.credential
         )
         self.database = self.client.get_database_client(self.database_name)
         self.old_container = self.database.get_container_client("chat-history")

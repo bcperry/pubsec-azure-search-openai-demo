@@ -46,7 +46,7 @@ async def test_upload_file(auth_client, monkeypatch, mock_data_lake_service_clie
 
     def mock_directory_get_file_client(self, *args, **kwargs):
         return azure.storage.filedatalake.aio.DataLakeFileClient(
-            account_url="https://test.blob.core.windows.net/", file_system_name="user-content", file_path=args[0]
+            account_url="https://test.blob.core.usgovcloudapi.net/", file_system_name="user-content", file_path=args[0]
         )
 
     monkeypatch.setattr(DataLakeDirectoryClient, "get_file_client", mock_directory_get_file_client)
@@ -150,7 +150,7 @@ async def test_delete_uploaded(auth_client, monkeypatch, mock_data_lake_service_
 
     def mock_directory_get_file_client(self, *args, **kwargs):
         return azure.storage.filedatalake.aio.DataLakeFileClient(
-            account_url="https://test.blob.core.windows.net/", file_system_name="user-content", file_path=args[0]
+            account_url="https://test.blob.core.usgovcloudapi.net/", file_system_name="user-content", file_path=args[0]
         )
 
     monkeypatch.setattr(DataLakeDirectoryClient, "get_file_client", mock_directory_get_file_client)

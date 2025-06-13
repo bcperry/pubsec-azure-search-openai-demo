@@ -372,7 +372,7 @@ python ./scripts/manageacl.py  -v --acl-action enable_acls
 And then update existing search documents with the storage URL of the main Blob container:
 
 ```shell
-python ./scripts/manageacl.py  -v --acl-action update_storage_urls --url <https://YOUR-MAIN-STORAGE-ACCOUNT.blob.core.windows.net/content/>
+python ./scripts/manageacl.py  -v --acl-action update_storage_urls --url <https://YOUR-MAIN-STORAGE-ACCOUNT.blob.core.usgovcloudapi.net/content/>
 ```
 
 Going forward, all uploaded documents will have their `storageUrl` set in the search index.
