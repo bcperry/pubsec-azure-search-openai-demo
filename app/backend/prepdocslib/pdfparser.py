@@ -14,7 +14,8 @@ from azure.ai.documentintelligence.models import (
     DocumentTable,
 )
 from azure.core.credentials import AzureKeyCredential
-from azure.core.credentials_async import AsyncTokenCredential
+# from azure.identity import DefaultAzureCredential
+from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import HttpResponseError
 from PIL import Image
 from pypdf import PdfReader
@@ -53,7 +54,7 @@ class DocumentAnalysisParser(Parser):
     def __init__(
         self,
         endpoint: str,
-        credential: Union[AsyncTokenCredential, AzureKeyCredential],
+        credential: Union[DefaultAzureCredential, AzureKeyCredential],
         model_id="prebuilt-layout",
         use_content_understanding=True,
         content_understanding_endpoint: Union[str, None] = None,

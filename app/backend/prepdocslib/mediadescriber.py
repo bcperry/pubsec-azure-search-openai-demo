@@ -2,7 +2,7 @@ import logging
 from abc import ABC
 
 import aiohttp
-from azure.core.credentials_async import AsyncTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.identity import get_bearer_token_provider
 from rich.progress import Progress
 from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed
@@ -38,7 +38,7 @@ class ContentUnderstandingDescriber:
         },
     }
 
-    def __init__(self, endpoint: str, credential: AsyncTokenCredential):
+    def __init__(self, endpoint: str, credential: DefaultAzureCredential):
         self.endpoint = endpoint
         self.credential = credential
 

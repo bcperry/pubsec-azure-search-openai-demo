@@ -5,7 +5,7 @@ from typing import Optional
 
 import openai.types
 from azure.cognitiveservices.speech import ResultReason
-from azure.core.credentials_async import AsyncTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.search.documents.agent.models import (
     KnowledgeAgentAzureSearchDocReference,
     KnowledgeAgentMessage,
@@ -26,13 +26,13 @@ MOCK_EMBEDDING_MODEL_NAME = "text-embedding-ada-002"
 MockToken = namedtuple("MockToken", ["token", "expires_on", "value"])
 
 
-class MockAzureCredential(AsyncTokenCredential):
+class MockAzureCredential(DefaultAzureCredential):
 
     async def get_token(self, uri):
         return MockToken("", 9999999999, "")
 
 
-class MockAzureCredentialExpired(AsyncTokenCredential):
+class MockAzureCredentialExpired(DefaultAzureCredential):
 
     def __init__(self):
         self.access_number = 0

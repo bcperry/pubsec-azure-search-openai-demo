@@ -9,7 +9,7 @@ from collections.abc import AsyncGenerator
 from glob import glob
 from typing import IO, Optional, Union
 
-from azure.core.credentials_async import AsyncTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.storage.filedatalake.aio import (
     DataLakeServiceClient,
 )
@@ -122,7 +122,7 @@ class ADLSGen2ListFileStrategy(ListFileStrategy):
         data_lake_storage_account: str,
         data_lake_filesystem: str,
         data_lake_path: str,
-        credential: Union[AsyncTokenCredential, str],
+        credential: Union[DefaultAzureCredential, str],
     ):
         self.data_lake_storage_account = data_lake_storage_account
         self.data_lake_filesystem = data_lake_filesystem

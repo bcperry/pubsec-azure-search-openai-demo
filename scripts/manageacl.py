@@ -7,7 +7,7 @@ from typing import Any, Union
 from urllib.parse import urljoin
 
 from azure.core.credentials import AzureKeyCredential
-from azure.core.credentials_async import AsyncTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.identity import DefaultAzureCredential
 from azure.identity import AzureAuthorityHosts
 from azure.search.documents.aio import SearchClient
@@ -35,7 +35,7 @@ class ManageAcl:
         acl_action: str,
         acl_type: str,
         acl: str,
-        credentials: Union[AsyncTokenCredential, AzureKeyCredential],
+        credentials: Union[DefaultAzureCredential, AzureKeyCredential],
     ):
         """
         Initializes the command
@@ -214,7 +214,7 @@ async def main(args: Any):
         if args.tenant_id is None
         else DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=args.tenant_id, process_timeout=60)
     )
-    search_credential: Union[AsyncTokenCredential, AzureKeyCredential] = azd_credential
+    search_credential: Union[DefaultAzureCredential, AzureKeyCredential] = azd_credential
     if args.search_key is not None:
         search_credential = AzureKeyCredential(args.search_key)
 

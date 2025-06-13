@@ -6,7 +6,7 @@ import re
 from typing import Optional, Union
 
 import pymupdf
-from azure.core.credentials_async import AsyncTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.storage.blob import (
     BlobSasPermissions,
     UserDelegationKey,
@@ -31,7 +31,7 @@ class BlobManager:
         endpoint: str,
         container: str,
         account: str,
-        credential: Union[AsyncTokenCredential, str],
+        credential: Union[DefaultAzureCredential, str],
         resourceGroup: str,
         subscriptionId: str,
         store_page_images: bool = False,

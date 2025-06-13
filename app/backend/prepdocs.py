@@ -5,7 +5,7 @@ import os
 from typing import Optional, Union
 
 from azure.core.credentials import AzureKeyCredential
-from azure.core.credentials_async import AsyncTokenCredential
+# from azure.identity import DefaultAzureCredential
 from azure.identity import DefaultAzureCredential, get_bearer_token_provider
 from azure.identity import AzureAuthorityHosts
 
@@ -50,7 +50,7 @@ def clean_key_if_exists(key: Union[str, None]) -> Union[str, None]:
 async def setup_search_info(
     search_service: str,
     index_name: str,
-    azure_credential: AsyncTokenCredential,
+    azure_credential: DefaultAzureCredential,
     use_agentic_retrieval: Union[bool, None] = None,
     azure_openai_endpoint: Union[str, None] = None,
     agent_name: Union[str, None] = None,
@@ -59,7 +59,7 @@ async def setup_search_info(
     azure_openai_searchagent_model: Union[str, None] = None,
     search_key: Union[str, None] = None,
 ) -> SearchInfo:
-    search_creds: Union[AsyncTokenCredential, AzureKeyCredential] = (
+    search_creds: Union[DefaultAzureCredential, AzureKeyCredential] = (
         azure_credential if search_key is None else AzureKeyCredential(search_key)
     )
     if use_agentic_retrieval and azure_openai_searchagent_model is None:
@@ -79,7 +79,7 @@ async def setup_search_info(
 
 
 def setup_blob_manager(
-    azure_credential: AsyncTokenCredential,
+    azure_credential: DefaultAzureCredential,
     storage_account: str,
     storage_container: str,
     storage_resource_group: str,
@@ -87,7 +87,7 @@ def setup_blob_manager(
     search_images: bool,
     storage_key: Union[str, None] = None,
 ):
-    storage_creds: Union[AsyncTokenCredential, str] = azure_credential if storage_key is None else storage_key
+    storage_creds: Union[DefaultAzureCredential, str] = azure_credential if storage_key is None else storage_key
     return BlobManager(
         endpoint=f"https://{storage_account}.blob.core.usgovcloudapi.net",
         container=storage_container,
@@ -100,7 +100,7 @@ def setup_blob_manager(
 
 
 def setup_list_file_strategy(
-    azure_credential: AsyncTokenCredential,
+    azure_credential: DefaultAzureCredential,
     local_files: Union[str, None],
     datalake_storage_account: Union[str, None],
     datalake_filesystem: Union[str, None],
@@ -111,7 +111,7 @@ def setup_list_file_strategy(
     if datalake_storage_account:
         if datalake_filesystem is None or datalake_path is None:
             raise ValueError("DataLake file system and path are required when using Azure Data Lake Gen2")
-        adls_gen2_creds: Union[AsyncTokenCredential, str] = azure_credential if datalake_key is None else datalake_key
+        adls_gen2_creds: Union[DefaultAzureCredential, str] = azure_credential if datalake_key is None else datalake_key
         logger.info("Using Data Lake Gen2 Storage Account: %s", datalake_storage_account)
         list_file_strategy = ADLSGen2ListFileStrategy(
             data_lake_storage_account=datalake_storage_account,
@@ -128,7 +128,7 @@ def setup_list_file_strategy(
 
 
 def setup_embeddings_service(
-    azure_credential: AsyncTokenCredential,
+    azure_credential: DefaultAzureCredential,
     openai_host: str,
     openai_model_name: str,
     openai_service: Union[str, None],
@@ -146,7 +146,7 @@ def setup_embeddings_service(
         return None
 
     if openai_host != "openai":
-        azure_open_ai_credential: Union[AsyncTokenCredential, AzureKeyCredential] = (
+        azure_open_ai_credential: Union[DefaultAzureCredential, AzureKeyCredential] = (
             azure_credential if openai_key is None else AzureKeyCredential(openai_key)
         )
         return AzureOpenAIEmbeddingService(
@@ -172,7 +172,7 @@ def setup_embeddings_service(
 
 
 def setup_file_processors(
-    azure_credential: AsyncTokenCredential,
+    azure_credential: DefaultAzureCredential,
     document_intelligence_service: Union[str, None],
     document_intelligence_key: Union[str, None] = None,
     local_pdf_parser: bool = False,
@@ -186,7 +186,7 @@ def setup_file_processors(
     doc_int_parser: Optional[DocumentAnalysisParser] = None
     # check if Azure Document Intelligence credentials are provided
     if document_intelligence_service is not None:
-        documentintelligence_creds: Union[AsyncTokenCredential, AzureKeyCredential] = (
+        documentintelligence_creds: Union[DefaultAzureCredential, AzureKeyCredential] = (
             azure_credential if document_intelligence_key is None else AzureKeyCredential(document_intelligence_key)
         )
         doc_int_parser = DocumentAnalysisParser(
@@ -243,7 +243,7 @@ def setup_file_processors(
 
 
 def setup_image_embeddings_service(
-    azure_credential: AsyncTokenCredential, vision_endpoint: Union[str, None], search_images: bool
+    azure_credential: DefaultAzureCredential, vision_endpoint: Union[str, None], search_images: bool
 ) -> Union[ImageEmbeddings, None]:
     image_embeddings_service: Optional[ImageEmbeddings] = None
     if search_images:

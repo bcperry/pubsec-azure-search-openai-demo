@@ -6,7 +6,7 @@ import os
 from typing import Any, Optional
 
 import aiohttp
-from azure.core.credentials_async import AsyncTokenCredential
+from azure.identity import DefaultAzureCredential
 from azure.identity import DefaultAzureCredential
 from azure.identity import AzureAuthorityHosts
 from azure.storage.filedatalake.aio import (
@@ -31,7 +31,7 @@ class AdlsGen2Setup:
         filesystem_name: str,
         security_enabled_groups: bool,
         data_access_control_format: dict[str, Any],
-        credentials: AsyncTokenCredential,
+        credentials: DefaultAzureCredential,
     ):
         """
         Initializes the command
