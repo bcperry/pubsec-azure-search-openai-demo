@@ -44,6 +44,16 @@ class LocalPdfParser(Parser):
             yield Page(page_num=page_num, offset=offset, text=page_text)
             offset += len(page_text)
 
+# NOTE: it seems that the DocumentIntelligenceClient class does not support Azure Government directly,
+# so we need to create a wrapper credential that ensures the correct scope is used.
+class AzureGovCredential:
+    def __init__(self, base_credential):
+        self.base_credential = base_credential
+    
+    def get_token(self, *scopes, **kwargs):
+        # Always use the Azure Government cognitive services scope
+        return self.base_credential.get_token("https://cognitiveservices.azure.us/.default", **kwargs)
+
 
 class DocumentAnalysisParser(Parser):
     """
@@ -61,7 +71,7 @@ class DocumentAnalysisParser(Parser):
     ):
         self.model_id = model_id
         self.endpoint = endpoint
-        self.credential = credential
+        self.credential = AzureGovCredential(credential) 
         self.use_content_understanding = use_content_understanding
         self.content_understanding_endpoint = content_understanding_endpoint
 
@@ -69,7 +79,9 @@ class DocumentAnalysisParser(Parser):
         logger.info("Extracting text from '%s' using Azure Document Intelligence", content.name)
 
         async with DocumentIntelligenceClient(
-            endpoint=self.endpoint, credential=self.credential
+            endpoint=self.endpoint, 
+            credential=self.credential,
+            api_version="2024-11-30"  # Use a gov compatible API version
         ) as document_intelligence_client:
             file_analyzed = False
             if self.use_content_understanding:
@@ -82,7 +94,7 @@ class DocumentAnalysisParser(Parser):
                 cu_describer = ContentUnderstandingDescriber(self.content_understanding_endpoint, self.credential)
                 content_bytes = content.read()
                 try:
-                    poller = await document_intelligence_client.begin_analyze_document(
+                    poller = await document_intelligence_client.DocumentIntelligenceClient(
                         model_id="prebuilt-layout",
                         analyze_request=AnalyzeDocumentRequest(bytes_source=content_bytes),
                         output=["figures"],
