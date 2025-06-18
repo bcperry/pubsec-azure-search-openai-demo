@@ -423,6 +423,10 @@ async def list_uploaded(auth_claims: dict[str, Any]):
 
 @bp.before_app_serving
 async def setup_clients():
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
     # Replace these with your own values, either in environment variables or directly here
     AZURE_STORAGE_ACCOUNT = os.environ["AZURE_STORAGE_ACCOUNT"]
     AZURE_STORAGE_CONTAINER = os.environ["AZURE_STORAGE_CONTAINER"]
@@ -505,18 +509,18 @@ async def setup_clients():
             current_app.logger.info(
                 "Setting up Azure credential using ManagedIdentityCredential with client_id %s", AZURE_CLIENT_ID
             )
-            azure_credential = ManagedIdentityCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, client_id=AZURE_CLIENT_ID)
+            azure_credential = ManagedIdentityCredential(authority=authority, client_id=AZURE_CLIENT_ID)
         else:
             current_app.logger.info("Setting up Azure credential using ManagedIdentityCredential")
-            azure_credential = ManagedIdentityCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+            azure_credential = ManagedIdentityCredential(authority=authority)
     # elif AZURE_TENANT_ID:
     #     current_app.logger.info(
     #         "Setting up Azure credential using DefaultAzureCredential with tenant_id %s", AZURE_TENANT_ID
     #     )
-    #     azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=AZURE_TENANT_ID, process_timeout=60)
+    #     azure_credential = DefaultAzureCredential(authority=authority, tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
         current_app.logger.info("Setting up Azure credential using DefaultAzureCredential for home tenant")
-        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, process_timeout=60)
+        azure_credential = DefaultAzureCredential(authority=authority, process_timeout=60)
 
     # Set the Azure credential in the app config for use in other parts of the app
     current_app.config[CONFIG_CREDENTIAL] = azure_credential

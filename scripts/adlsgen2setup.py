@@ -160,8 +160,11 @@ async def main(args: Any):
 
     if not os.getenv("AZURE_ADLS_GEN2_STORAGE_ACCOUNT"):
         raise Exception("AZURE_ADLS_GEN2_STORAGE_ACCOUNT must be set to continue")
-
-    async with DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT) as credentials:
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
+    async with DefaultAzureCredential(authority=authority) as credentials:
         with open(args.data_access_control) as f:
             data_access_control_format = json.load(f)
         command = AdlsGen2Setup(

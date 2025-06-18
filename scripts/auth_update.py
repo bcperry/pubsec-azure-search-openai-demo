@@ -16,9 +16,13 @@ async def main():
     if not test_authentication_enabled():
         print("Not updating authentication.")
         exit(0)
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
 
     auth_tenant = os.getenv("AZURE_AUTH_TENANT_ID", os.environ["AZURE_TENANT_ID"])
-    credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=auth_tenant)
+    credential = DefaultAzureCredential(authority=authority, tenant_id=auth_tenant)
 
     scopes = ["https://graph.microsoft.us/.default"]
     graph_client = GraphServiceClient(credentials=credential, scopes=scopes)

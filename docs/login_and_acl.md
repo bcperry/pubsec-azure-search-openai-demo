@@ -228,8 +228,12 @@ Get an access token that can be used for calling the chat API using the followin
 from azure.identity import DefaultAzureCredential
 from azure.identity import AzureAuthorityHosts
 import os
+if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+    authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+else:
+    authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
 
-token = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT).get_token(f"api://{os.environ['AZURE_SERVER_APP_ID']}/access_as_user", tenant_id=os.getenv('AZURE_AUTH_TENANT_ID', os.getenv('AZURE_TENANT_ID')))
+token = DefaultAzureCredential(authority=authority).get_token(f"api://{os.environ['AZURE_SERVER_APP_ID']}/access_as_user", tenant_id=os.getenv('AZURE_AUTH_TENANT_ID', os.getenv('AZURE_TENANT_ID')))
 
 print(token.token)
 ```

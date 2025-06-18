@@ -50,9 +50,13 @@ class CosmosDBMigrator:
             database_name: Database name
             credential: Azure credential, defaults to DefaultAzureCredential
         """
+        if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+            authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+        else:
+            authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
         self.cosmos_account = cosmos_account
         self.database_name = database_name
-        self.credential = credential or DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+        self.credential = credential or DefaultAzureCredential(authority=authority)
         self.client = None
         self.database = None
         self.old_container = None

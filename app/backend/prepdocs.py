@@ -328,6 +328,10 @@ if __name__ == "__main__":
     if os.getenv("AZURE_PUBLIC_NETWORK_ACCESS") == "Disabled":
         logger.error("AZURE_PUBLIC_NETWORK_ACCESS is set to Disabled. Exiting.")
         exit(0)
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
 
     use_int_vectorization = os.getenv("USE_FEATURE_INT_VECTORIZATION", "").lower() == "true"
     use_gptvision = os.getenv("USE_GPT4V", "").lower() == "true"
@@ -339,10 +343,10 @@ if __name__ == "__main__":
     # Use the current user identity to connect to Azure services. See infra/main.bicep for role assignments.
     # if tenant_id := os.getenv("AZURE_TENANT_ID"):
     #     logger.info("Connecting to Azure services using the azd credential for tenant %s", tenant_id)
-    #     azd_credential = DefaultAzureCredential(tenant_id=tenant_id, process_timeout=60, authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+    #     azd_credential = DefaultAzureCredential(tenant_id=tenant_id, process_timeout=60, authority=authority)
     # else:
     logger.info("Connecting to Azure services using the azd credential for home tenant")
-    azd_credential = DefaultAzureCredential(process_timeout=60, authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+    azd_credential = DefaultAzureCredential(process_timeout=60, authority=authority)
 
     if args.removeall:
         document_action = DocumentAction.RemoveAll

@@ -49,6 +49,11 @@ param tokenStorageContainerName string = 'tokens'
 
 param appServiceSkuName string // Set in main.parameters.json
 
+
+@description('Azure cloud selection for the deployment. This is used to select the correct Azure environment for the OpenAI service and other resources.')
+@allowed(['AzureCloud', 'AzureChinaCloud', 'AzureUSGovernment'])
+param azureCloudEnvironment string
+
 @allowed(['azure', 'openai', 'azure_custom'])
 param openAiHost string // Set in main.parameters.json
 param isAzureOpenAiHost bool = startsWith(openAiHost, 'azure')
@@ -145,33 +150,36 @@ param computerVisionSkuName string // Set in main.parameters.json
 param contentUnderstandingServiceName string = '' // Set in main.parameters.json
 param contentUnderstandingResourceGroupName string = '' // Set in main.parameters.json
 
-param chatGptModelName string = ''
-param chatGptDeploymentName string = ''
-param chatGptDeploymentVersion string = ''
-param chatGptDeploymentSkuName string = ''
-param chatGptDeploymentCapacity int = 0
+param chatGptModelName string = 'gpt-4o'
+param chatGptDeploymentName string = chatGptModelName
+param chatGptDeploymentVersion string = '2024-05-13'
+param chatGptDeploymentSkuName string = azureCloudEnvironment == 'AzureUSGovernment'
+    ? 'Standard'
+    : 'GlobalStandard'
+param chatGptDeploymentCapacity int = 10
 
 var chatGpt = {
-  modelName: !empty(chatGptModelName) ? chatGptModelName : 'thisone'
-  deploymentName: !empty(chatGptDeploymentName) ? chatGptDeploymentName : 'thatone'
-  deploymentVersion: !empty(chatGptDeploymentVersion) ? chatGptDeploymentVersion : '2025-04-14'
-  deploymentSkuName: !empty(chatGptDeploymentSkuName) ? chatGptDeploymentSkuName : 'GlobalStandard'
-  deploymentCapacity: chatGptDeploymentCapacity != 0 ? chatGptDeploymentCapacity : 30
+  modelName: chatGptModelName
+  deploymentName: chatGptDeploymentName
+  deploymentVersion: chatGptDeploymentVersion
+  deploymentSkuName: chatGptDeploymentSkuName 
+  deploymentCapacity: chatGptDeploymentCapacity
 }
 
-param embeddingModelName string = ''
-param embeddingDeploymentName string = ''
+param embeddingModelName string = 'text-embedding-ada-002'
+param embeddingDeploymentName string = embeddingModelName
 param embeddingDeploymentVersion string = ''
-param embeddingDeploymentSkuName string = ''
-param embeddingDeploymentCapacity int = 0
-param embeddingDimensions int = 0
+param embeddingDeploymentSkuName string = azureCloudEnvironment == 'AzureUSGovernment'
+    ? 'Standard'
+    : 'GlobalStandard'
+param embeddingDeploymentCapacity int = 30
 var embedding = {
-  modelName: !empty(embeddingModelName) ? embeddingModelName : 'text-embedding-3-large'
-  deploymentName: !empty(embeddingDeploymentName) ? embeddingDeploymentName : 'text-embedding-3-large'
+  modelName: embeddingModelName
+  deploymentName: embeddingDeploymentName
   deploymentVersion: !empty(embeddingDeploymentVersion) ? embeddingDeploymentVersion : (embeddingModelName == 'text-embedding-ada-002' ? '2' : '1')
-  deploymentSkuName: !empty(embeddingDeploymentSkuName) ? embeddingDeploymentSkuName : (embeddingModelName == 'text-embedding-ada-002' ? 'Standard' : 'GlobalStandard')
-  deploymentCapacity: embeddingDeploymentCapacity != 0 ? embeddingDeploymentCapacity : 30
-  dimensions: embeddingDimensions != 0 ? embeddingDimensions : 3072
+  deploymentSkuName: embeddingDeploymentSkuName
+  deploymentCapacity: embeddingDeploymentCapacity
+  dimensions: embeddingModelName == 'text-embedding-ada-002' ? 1536 : 3072
 }
 
 param gpt4vModelName string = ''
@@ -183,7 +191,7 @@ var gpt4v = {
   modelName: !empty(gpt4vModelName) ? gpt4vModelName : 'gpt-4o'
   deploymentName: !empty(gpt4vDeploymentName) ? gpt4vDeploymentName : 'vision'
   deploymentVersion: !empty(gpt4vModelVersion) ? gpt4vModelVersion : '2024-08-06'
-  deploymentSkuName: !empty(gpt4vDeploymentSkuName) ? gpt4vDeploymentSkuName : 'GlobalStandard' // Not-backward compatible
+  deploymentSkuName: !empty(gpt4vDeploymentSkuName) ? gpt4vDeploymentSkuName : (azureCloudEnvironment == 'AzureUSGovernment' ? 'Standard' : 'GlobalStandard') // Not-backward compatible
   deploymentCapacity: gpt4vDeploymentCapacity != 0 ? gpt4vDeploymentCapacity : 10
 }
 
@@ -196,7 +204,7 @@ var eval = {
   modelName: !empty(evalModelName) ? evalModelName : 'gpt-4o'
   deploymentName: !empty(evalDeploymentName) ? evalDeploymentName : 'eval'
   deploymentVersion: !empty(evalModelVersion) ? evalModelVersion : '2024-08-06'
-  deploymentSkuName: !empty(evalDeploymentSkuName) ? evalDeploymentSkuName : 'GlobalStandard' // Not backward-compatible
+  deploymentSkuName: !empty(evalDeploymentSkuName) ? evalDeploymentSkuName : (azureCloudEnvironment == 'AzureUSGovernment' ? 'Standard' : 'GlobalStandard') // Not backward-compatible
   deploymentCapacity: evalDeploymentCapacity != 0 ? evalDeploymentCapacity : 30
 }
 
@@ -206,10 +214,10 @@ param searchAgentModelVersion string = ''
 param searchAgentDeploymentSkuName string = ''
 param searchAgentDeploymentCapacity int = 0
 var searchAgent = {
-  modelName: !empty(searchAgentModelName) ? searchAgentModelName : 'theotherone'
+  modelName: !empty(searchAgentModelName) ? searchAgentModelName : 'gpt-4o'
   deploymentName: !empty(searchAgentDeploymentName) ? searchAgentDeploymentName : 'searchagent'
   deploymentVersion: !empty(searchAgentModelVersion) ? searchAgentModelVersion : '2025-04-14'
-  deploymentSkuName: !empty(searchAgentDeploymentSkuName) ? searchAgentDeploymentSkuName : 'GlobalStandard'
+  deploymentSkuName: !empty(searchAgentDeploymentSkuName) ? searchAgentDeploymentSkuName : (azureCloudEnvironment == 'AzureUSGovernment' ? 'Standard' : 'GlobalStandard')
   deploymentCapacity: searchAgentDeploymentCapacity != 0 ? searchAgentDeploymentCapacity : 30
 }
 
@@ -285,7 +293,7 @@ var resourceToken = toLower(uniqueString(subscription().id, environmentName, loc
 var tags = { 'azd-env-name': environmentName }
 
 var tenantIdForAuth = !empty(authTenantId) ? authTenantId : tenantId
-var authenticationIssuerUri = '${environment().authentication.loginEndpoint}${tenantIdForAuth}/v2.0'
+var authenticationIssuerUri = '${environment().authentication.loginEndpoint}/${tenantIdForAuth}/v2.0'
 
 @description('Whether the deployment is running on GitHub Actions')
 param runningOnGh string = ''
@@ -401,6 +409,7 @@ module appServicePlan 'core/host/appserviceplan.bicep' = if (deploymentTarget ==
 }
 
 var appEnvVariables = {
+  AZURE_CLOUD_ENVIRONMENT: azureCloudEnvironment
   AZURE_STORAGE_ACCOUNT: storage.outputs.name
   AZURE_STORAGE_CONTAINER: storageContainerName
   AZURE_SEARCH_INDEX: searchIndexName
@@ -1354,3 +1363,5 @@ output BACKEND_URI string = deploymentTarget == 'appservice' ? backend.outputs.u
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = deploymentTarget == 'containerapps'
   ? containerApps.outputs.registryLoginServer
   : ''
+
+output AZURE_CLOUD_ENVIRONMENT string = azureCloudEnvironment

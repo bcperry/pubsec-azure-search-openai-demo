@@ -192,7 +192,11 @@ async def main():
         )
         exit(1)
     print("Setting up authentication for tenant", auth_tenant)
-    credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=auth_tenant)
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
+    credential = DefaultAzureCredential(authority=authority, tenant_id=auth_tenant)
 
     scopes = ["https://graph.microsoft.us/.default"]
     graph_client = GraphServiceClient(credentials=credential, scopes=scopes)

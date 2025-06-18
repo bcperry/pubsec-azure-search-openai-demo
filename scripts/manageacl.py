@@ -207,12 +207,15 @@ class ManageAcl:
 
 async def main(args: Any):
     load_azd_env()
-
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
     # Use the current user identity to connect to Azure services unless a key is explicitly set for any of them
     azd_credential = (
-        DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT)
+        DefaultAzureCredential(authority=authority)
         if args.tenant_id is None
-        else DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=args.tenant_id, process_timeout=60)
+        else DefaultAzureCredential(authority=authority, tenant_id=args.tenant_id, process_timeout=60)
     )
     search_credential: Union[DefaultAzureCredential, AzureKeyCredential] = azd_credential
     if args.search_key is not None:

@@ -1,9 +1,11 @@
 import html
 import io
+import json
 import logging
 from collections.abc import AsyncGenerator
 from enum import Enum
 from typing import IO, Union
+import os
 
 import pymupdf
 from azure.ai.documentintelligence.aio import DocumentIntelligenceClient
@@ -14,7 +16,6 @@ from azure.ai.documentintelligence.models import (
     DocumentTable,
 )
 from azure.core.credentials import AzureKeyCredential
-# from azure.identity import DefaultAzureCredential
 from azure.identity import DefaultAzureCredential
 from azure.core.exceptions import HttpResponseError
 from PIL import Image
@@ -25,6 +26,17 @@ from .page import Page
 from .parser import Parser
 
 logger = logging.getLogger("scripts")
+
+# Load cloud configuration based on environment
+cloud_config = {}
+if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+    cloud_config_path = os.path.join(os.path.dirname(__file__), "..", "clouds", "AzureUSGovernment.json")
+    with open(cloud_config_path, 'r') as f:
+        cloud_config = json.load(f)
+else:
+    cloud_config_path = os.path.join(os.path.dirname(__file__), "..", "clouds", "AzureCloud.json")
+    with open(cloud_config_path, 'r') as f:
+        cloud_config = json.load(f)
 
 
 class LocalPdfParser(Parser):
@@ -69,9 +81,13 @@ class DocumentAnalysisParser(Parser):
         use_content_understanding=True,
         content_understanding_endpoint: Union[str, None] = None,
     ):
+
         self.model_id = model_id
         self.endpoint = endpoint
-        self.credential = AzureGovCredential(credential) 
+        if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+            self.credential = AzureGovCredential(credential) 
+        else:
+            self.credential = credential
         self.use_content_understanding = use_content_understanding
         self.content_understanding_endpoint = content_understanding_endpoint
 

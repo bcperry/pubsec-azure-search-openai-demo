@@ -22,15 +22,23 @@ logger = logging.getLogger("ragapp")
 
 root_dir = pathlib.Path(__file__).parent
 
+if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+    authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+else:
+    authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
 
 def get_azure_credential():
     AZURE_TENANT_ID = os.getenv("AZURE_TENANT_ID")
+    if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        authority = AzureAuthorityHosts.AZURE_GOVERNMENT
+    else:
+        authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
     if AZURE_TENANT_ID:
         logger.info("Setting up Azure credential using DefaultAzureCredential with tenant_id %s", AZURE_TENANT_ID)
-        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, tenant_id=AZURE_TENANT_ID, process_timeout=60)
+        azure_credential = DefaultAzureCredential(authority=authority, tenant_id=AZURE_TENANT_ID, process_timeout=60)
     else:
         logger.info("Setting up Azure credential using DefaultAzureCredential for home tenant")
-        azure_credential = DefaultAzureCredential(authority=AzureAuthorityHosts.AZURE_GOVERNMENT, process_timeout=60)
+        azure_credential = DefaultAzureCredential(authority=authority, process_timeout=60)
     return azure_credential
 
 
