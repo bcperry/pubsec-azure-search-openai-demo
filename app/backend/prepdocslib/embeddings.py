@@ -17,7 +17,8 @@ from tenacity import (
     wait_random_exponential,
 )
 from typing_extensions import TypedDict
-
+from core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 logger = logging.getLogger("scripts")
 
 
@@ -172,7 +173,7 @@ class AzureOpenAIEmbeddingService(OpenAIEmbeddings):
         super().__init__(open_ai_model_name, open_ai_dimensions, disable_batch)
         self.open_ai_service = open_ai_service
         if open_ai_service:
-            self.open_ai_endpoint = f"https://{open_ai_service}.openai.azure.us"
+            self.open_ai_endpoint = f"https://{open_ai_service}.{cloudConfig['openAiEndpointSuffix']}"
         elif open_ai_custom_url:
             self.open_ai_endpoint = open_ai_custom_url
         else:
@@ -191,7 +192,7 @@ class AzureOpenAIEmbeddingService(OpenAIEmbeddings):
             auth_args["api_key"] = self.credential.key
         elif isinstance(self.credential, DefaultAzureCredential):
             auth_args["azure_ad_token_provider"] = get_bearer_token_provider(
-                self.credential, "https://cognitiveservices.azure.us/.default"
+                self.credential, f"https://{cloudConfig['cognitiveServicesEndpointSuffix']}/.default"
             )
         else:
             raise TypeError("Invalid credential type")

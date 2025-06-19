@@ -10,7 +10,8 @@ from msgraph.generated.models.spa_application import SpaApplication
 from msgraph.generated.models.web_application import WebApplication
 
 from auth_common import get_application, test_authentication_enabled
-
+from ..app.backend.core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 async def main():
     if not test_authentication_enabled():
@@ -24,7 +25,7 @@ async def main():
     auth_tenant = os.getenv("AZURE_AUTH_TENANT_ID", os.environ["AZURE_TENANT_ID"])
     credential = DefaultAzureCredential(authority=authority, tenant_id=auth_tenant)
 
-    scopes = ["https://graph.microsoft.us/.default"]
+    scopes = [f"{cloudConfig['microsoftGraphEndpoint']}/.default"]
     graph_client = GraphServiceClient(credentials=credential, scopes=scopes)
 
     uri = os.getenv("BACKEND_URI")

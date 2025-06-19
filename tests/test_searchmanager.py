@@ -18,7 +18,8 @@ from prepdocslib.listfilestrategy import File
 from prepdocslib.searchmanager import SearchManager, Section
 from prepdocslib.strategy import SearchInfo
 from prepdocslib.textsplitter import SplitPage
-
+from ..app.backend.core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 from .mocks import (
     MOCK_EMBEDDING_DIMENSIONS,
     MOCK_EMBEDDING_MODEL_NAME,
@@ -30,7 +31,7 @@ from .mocks import (
 @pytest.fixture
 def search_info():
     return SearchInfo(
-        endpoint="https://testsearchclient.blob.core.usgovcloudapi.net",
+        endpoint=f"https://testsearchclient.blob.{cloudConfig['storageEndpointSuffix']}",
         credential=AzureKeyCredential("test"),
         index_name="test",
     )

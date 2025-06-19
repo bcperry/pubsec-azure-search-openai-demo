@@ -13,8 +13,11 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from core.authentication import AuthenticationHelper, AuthError
+from ..app.backend.core.cloudhelper import CloudConfiguration
 
 from .mocks import MockAsyncPageIterator, MockResponse
+
+cloudConfig = CloudConfiguration().config
 
 MockSearchIndex = SearchIndex(
     name="test",
@@ -45,13 +48,13 @@ def create_authentication_helper(
 
 def create_search_client():
     return SearchClient(endpoint="", index_name="", credential=AzureKeyCredential(""),
-        audience="https://search.azure.us")
+        audience=f"https://{cloudConfig['azureSearchEndpointSuffix']}")
 
 
 def create_mock_jwt(kid="mock_kid", oid="OID_X"):
     # Create a payload with necessary claims
     payload = {
-        "iss": "https://login.microsoftonline.us/TENANT_ID/v2.0",
+        "iss": f"{cloudConfig['entraIdAuthEndpoint']}/TENANT_ID/v2.0",
         "sub": "AaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaA",
         "aud": "SERVER_APP",
         "exp": int((datetime.now(timezone.utc) + timedelta(hours=1)).timestamp()),
@@ -619,7 +622,7 @@ async def test_validate_access_token(monkeypatch, mock_confidential_client_succe
                             "n": "hu2SJ",
                             "e": "AQAB",
                             "x5c": ["MIIC/jCC"],
-                            "issuer": "https://login.microsoftonline.us/TENANT_ID/v2.0",
+                            "issuer": f"{cloudConfig['entraIdAuthEndpoint']}/TENANT_ID/v2.0",
                         },
                         {
                             "kty": "RSA",
@@ -629,7 +632,7 @@ async def test_validate_access_token(monkeypatch, mock_confidential_client_succe
                             "n": "yfNcG8",
                             "e": "AQAB",
                             "x5c": ["MIIC/jCC"],
-                            "issuer": "https://login.microsoftonline.us/TENANT_ID/v2.0",
+                            "issuer": f"{cloudConfig['entraIdAuthEndpoint']}/TENANT_ID/v2.0",
                         },
                     ]
                 }

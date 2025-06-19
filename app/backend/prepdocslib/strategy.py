@@ -6,6 +6,8 @@ from azure.core.credentials import AzureKeyCredential
 from azure.identity import DefaultAzureCredential
 from azure.search.documents.aio import SearchClient
 from azure.search.documents.indexes.aio import SearchIndexClient, SearchIndexerClient
+from core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 USER_AGENT = "azure-search-chat-demo/1.0.0"
 
@@ -42,17 +44,17 @@ class SearchInfo:
         return SearchClient(endpoint=self.endpoint, 
                             index_name=self.index_name, 
                             credential=self.credential,
-                            audience="https://search.azure.us")
+                            audience=f"https://{cloudConfig['azureSearchEndpointSuffix']}")
 
     def create_search_index_client(self) -> SearchIndexClient:
         return SearchIndexClient(endpoint=self.endpoint, 
                                 credential=self.credential,
-                                audience="https://search.azure.us")
+                                audience=f"https://{cloudConfig['azureSearchEndpointSuffix']}")
 
     def create_search_indexer_client(self) -> SearchIndexerClient:
         return SearchIndexerClient(endpoint=self.endpoint, 
                                    credential=self.credential,
-                                   audience="https://search.azure.us")
+                                   audience=f"https://{cloudConfig['azureSearchEndpointSuffix']}")
 
 
 class DocumentAction(Enum):

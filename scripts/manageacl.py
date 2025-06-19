@@ -66,7 +66,7 @@ class ManageAcl:
         self.acl = acl
 
     async def run(self):
-        endpoint = f"https://{self.service_name}.search.azure.us"
+        endpoint = f"https://{self.service_name}.{cloudConfig['azureSearchEndpointSuffix']}"
         if self.acl_action == "enable_acls":
             await self.enable_acls(endpoint)
             return

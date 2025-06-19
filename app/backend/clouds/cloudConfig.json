@@ -1,0 +1,34 @@
+{
+  "environments": {
+    "AzureUSGovernment": {
+        "name": "AzureUSGovernment",
+        "azureSearchEndpointSuffix": "search.azure.us",
+        "cognitiveServicesEndpointSuffix": "cognitiveservices.azure.us",
+        "cosmosEndpointSuffix": "documents.azure.us",
+        "entraIdAuthEndpoint": "https://login.microsoftonline.us/",
+        "openAiEndpointSuffix": "openai.azure.us",
+        "storageEndpointSuffix": "core.usgovcloudapi.net",
+        "microsoftGraphEndpoint": "https://graph.microsoft.us"
+    },
+    "AzurePublic": {
+        "name": "AzurePublic",
+        "azureSearchEndpointSuffix": "search.windows.net",
+        "cognitiveServicesEndpointSuffix": "cognitiveservices.azure.com",
+        "cosmosEndpointSuffix": "documents.azure.com",
+        "entraIdAuthEndpoint": "https://login.microsoftonline.com/",
+        "openAiEndpointSuffix": "openai.azure.com",
+        "storageEndpointSuffix": "core.windows.net",
+        "microsoftGraphEndpoint": "https://graph.microsoft.com"
+    },
+    "AzureChina": {
+        "name": "AzureChina",
+        "azureSearchEndpointSuffix": "search.azure.cn",
+        "cognitiveServicesEndpointSuffix": "cognitiveservices.azure.cn",
+        "cosmosEndpointSuffix": "documents.azure.cn",
+        "entraIdAuthEndpoint": "https://login.partner.microsoftonline.cn/",
+        "openAiEndpointSuffix": "openai.azure.cn",
+        "storageEndpointSuffix": "core.chinacloudapi.cn",
+        "microsoftGraphEndpoint": "https://microsoftgraph.chinacloudapi.cn"
+    }
+  }
+}

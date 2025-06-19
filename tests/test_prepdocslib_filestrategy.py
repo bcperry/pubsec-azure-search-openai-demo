@@ -12,7 +12,8 @@ from prepdocslib.listfilestrategy import (
 from prepdocslib.strategy import SearchInfo
 from prepdocslib.textparser import TextParser
 from prepdocslib.textsplitter import SimpleTextSplitter
-
+from ..app.backend.core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 from .mocks import MockAzureCredential
 
 
@@ -22,7 +23,7 @@ async def test_file_strategy_adls2(monkeypatch, mock_env, mock_data_lake_service
         data_lake_storage_account="a", data_lake_filesystem="a", data_lake_path="a", credential=MockAzureCredential()
     )
     blob_manager = BlobManager(
-        endpoint=f"https://{os.environ['AZURE_STORAGE_ACCOUNT']}.blob.core.usgovcloudapi.net",
+        endpoint=f"https://{os.environ['AZURE_STORAGE_ACCOUNT']}.blob.{cloudConfig['storageEndpointSuffix']}",
         credential=MockAzureCredential(),
         container=os.environ["AZURE_STORAGE_CONTAINER"],
         account=os.environ["AZURE_STORAGE_ACCOUNT"],
@@ -45,7 +46,7 @@ async def test_file_strategy_adls2(monkeypatch, mock_env, mock_data_lake_service
     monkeypatch.setattr("azure.storage.blob.aio.ContainerClient.upload_blob", mock_upload_blob)
 
     search_info = SearchInfo(
-        endpoint="https://testsearchclient.blob.core.usgovcloudapi.net",
+        endpoint=f"https://testsearchclient.blob.{cloudConfig['storageEndpointSuffix']}",
         credential=MockAzureCredential(),
         index_name="test",
     )
@@ -78,7 +79,7 @@ async def test_file_strategy_adls2(monkeypatch, mock_env, mock_data_lake_service
             "oids": ["A-USER-ID"],
             "sourcepage": "a.txt",
             "sourcefile": "a.txt",
-            "storageUrl": "https://test.blob.core.usgovcloudapi.net/a.txt",
+            "storageUrl": f"https://test.blob.{cloudConfig['storageEndpointSuffix']}/a.txt",
         },
         {
             "id": "file-b_txt-622E7478747B276F696473273A205B27422D555345522D4944275D2C202767726F757073273A205B27422D47524F55502D4944275D7D-page-0",
@@ -88,7 +89,7 @@ async def test_file_strategy_adls2(monkeypatch, mock_env, mock_data_lake_service
             "oids": ["B-USER-ID"],
             "sourcepage": "b.txt",
             "sourcefile": "b.txt",
-            "storageUrl": "https://test.blob.core.usgovcloudapi.net/b.txt",
+            "storageUrl": f"https://test.blob.{cloudConfig['storageEndpointSuffix']}/b.txt",
         },
         {
             "id": "file-c_txt-632E7478747B276F696473273A205B27432D555345522D4944275D2C202767726F757073273A205B27432D47524F55502D4944275D7D-page-0",
@@ -98,6 +99,6 @@ async def test_file_strategy_adls2(monkeypatch, mock_env, mock_data_lake_service
             "oids": ["C-USER-ID"],
             "sourcepage": "c.txt",
             "sourcefile": "c.txt",
-            "storageUrl": "https://test.blob.core.usgovcloudapi.net/c.txt",
+            "storageUrl": f"https://test.blob.{cloudConfig['storageEndpointSuffix']}/c.txt",
         },
     ]

@@ -67,7 +67,7 @@ class CosmosDBMigrator:
         Connect to CosmosDB and initialize containers.
         """
         self.client = CosmosClient(
-            url=f"https://{self.cosmos_account}.documents.azure.us	:443/", credential=self.credential
+            url=f"https://{self.cosmos_account}.{cloudConfig['cosmosEndpointSuffix']}:443/", credential=self.credential
         )
         self.database = self.client.get_database_client(self.database_name)
         self.old_container = self.database.get_container_client("chat-history")

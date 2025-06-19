@@ -14,6 +14,9 @@ from azure.storage.filedatalake.aio import (
     DataLakeServiceClient,
 )
 
+from app.backend.core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
+
 from load_azd_env import load_azd_env
 
 logger = logging.getLogger("scripts")
@@ -124,12 +127,12 @@ class AdlsGen2Setup:
     async def create_or_get_group(self, group_name: str):
         group_id = None
         if not self.graph_headers:
-            token_result = await self.credentials.get_token("https://graph.microsoft.us/.default")
+            token_result = await self.credentials.get_token(f"{cloudConfig['microsoftGraphEndpoint']}/.default")
             self.graph_headers = {"Authorization": f"Bearer {token_result.token}"}
         async with aiohttp.ClientSession(headers=self.graph_headers) as session:
             logger.info(f"Searching for group {group_name}...")
             async with session.get(
-                f"https://graph.microsoft.us/v1.0/groups?$select=id&$top=1&$filter=displayName eq '{group_name}'"
+                f"{cloudConfig['microsoftGraphEndpoint']}/v1.0/groups?$select=id&$top=1&$filter=displayName eq '{group_name}'"
             ) as response:
                 content = await response.json()
                 if response.status != 200:
@@ -146,7 +149,7 @@ class AdlsGen2Setup:
                     # "mailEnabled": False,
                     # "mailNickname": group_name,
                 }
-                async with session.post("https://graph.microsoft.us/v1.0/groups", json=group) as response:
+                async with session.post(f"{cloudConfig['microsoftGraphEndpoint']}/v1.0/groups", json=group) as response:
                     content = await response.json()
                     if response.status != 201:
                         raise Exception(content)

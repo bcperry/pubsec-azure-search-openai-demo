@@ -17,6 +17,8 @@ from ragas.testset import TestsetGenerator
 from ragas.testset.graph import KnowledgeGraph, Node, NodeType
 from ragas.testset.transforms import apply_transforms, default_transforms
 from rich.logging import RichHandler
+from ..app.backend.core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 logger = logging.getLogger("ragapp")
 
@@ -44,10 +46,10 @@ def get_azure_credential():
 
 def get_search_documents(azure_credential, num_search_documents=None) -> str:
     search_client = SearchClient(
-        endpoint=f"https://{os.getenv('AZURE_SEARCH_SERVICE')}.search.azure.us",
+        endpoint=f"https://{os.getenv('AZURE_SEARCH_SERVICE')}.{cloudConfig['azureSearchEndpointSuffix']}",
         index_name=os.getenv("AZURE_SEARCH_INDEX"),
         credential=azure_credential,
-        audience="https://search.azure.us"
+        audience=f"https://{cloudConfig['azureSearchEndpointSuffix']}"
     )
     all_documents = []
     if num_search_documents is None:
@@ -65,9 +67,9 @@ def get_search_documents(azure_credential, num_search_documents=None) -> str:
 def generate_ground_truth_ragas(num_questions=200, num_search_documents=None, kg_file=None):
     azure_credential = get_azure_credential()
     azure_openai_api_version = os.getenv("AZURE_OPENAI_API_VERSION") or "2024-06-01"
-    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.us"
+    azure_endpoint = f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.{cloudConfig['openAiEndpointSuffix']}"
     azure_ad_token_provider = get_bearer_token_provider(
-        azure_credential, "https://cognitiveservices.azure.us/.default"
+        azure_credential, f"https://{cloudConfig['cognitiveServicesEndpointSuffix']}/.default"
     )
     generator_llm = LangchainLLMWrapper(
         AzureChatOpenAI(

@@ -24,6 +24,8 @@ from msgraph.generated.models.web_application import WebApplication
 
 from auth_common import get_application, test_authentication_enabled
 from load_azd_env import load_azd_env
+from ..app.backend.core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 
 async def create_application(graph_client: GraphServiceClient, request_app: Application) -> tuple[str, str]:
@@ -198,7 +200,7 @@ async def main():
         authority = AzureAuthorityHosts.AZURE_PUBLIC_CLOUD
     credential = DefaultAzureCredential(authority=authority, tenant_id=auth_tenant)
 
-    scopes = ["https://graph.microsoft.us/.default"]
+    scopes = [f"{cloudConfig['microsoftGraphEndpoint']}/.default"]
     graph_client = GraphServiceClient(credentials=credential, scopes=scopes)
 
     app_identifier = random_app_identifier()

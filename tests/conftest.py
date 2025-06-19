@@ -30,6 +30,8 @@ from openai.types.create_embedding_response import Usage
 import app
 import core
 from core.authentication import AuthenticationHelper
+from core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 from .mocks import (
     MockAsyncPageIterator,
@@ -309,7 +311,7 @@ envs = [
         "AZURE_OPENAI_EMB_DIMENSIONS": "3072",
         "USE_GPT4V": "true",
         "AZURE_OPENAI_GPT4V_MODEL": "gpt-4",
-        "VISION_ENDPOINT": "https://testvision.cognitiveservices.azure.us/",
+        "VISION_ENDPOINT": "https://testvision.{cloudConfig['cognitiveServicesEndpointSuffix']}/",
     },
 ]
 
@@ -902,7 +904,7 @@ def mock_data_lake_service_client(monkeypatch):
         self.acl = ""
 
     def mock_url(self, *args, **kwargs):
-        return f"https://test.blob.core.usgovcloudapi.net/{self.path}"
+        return f"https://test.blob.{cloudConfig['storageEndpointSuffix']}/{self.path}"
 
     def mock_download_file(self, *args, **kwargs):
         return azure.storage.filedatalake.StorageStreamDownloader(None)

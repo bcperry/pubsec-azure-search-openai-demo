@@ -36,6 +36,8 @@ from prepdocslib.pdfparser import DocumentAnalysisParser, LocalPdfParser
 from prepdocslib.strategy import DocumentAction, SearchInfo, Strategy
 from prepdocslib.textparser import TextParser
 from prepdocslib.textsplitter import SentenceTextSplitter, SimpleTextSplitter
+from core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 logger = logging.getLogger("scripts")
 
@@ -66,7 +68,7 @@ async def setup_search_info(
         raise ValueError("Azure OpenAI SearchAgent model must be specified when using agentic retrieval.")
 
     return SearchInfo(
-        endpoint=f"https://{search_service}.search.azure.us/",
+        endpoint=f"https://{search_service}.{cloudConfig['azureSearchEndpointSuffix']}/",
         credential=search_creds,
         index_name=index_name,
         agent_name=agent_name,
@@ -89,7 +91,7 @@ def setup_blob_manager(
 ):
     storage_creds: Union[DefaultAzureCredential, str] = azure_credential if storage_key is None else storage_key
     return BlobManager(
-        endpoint=f"https://{storage_account}.blob.core.usgovcloudapi.net",
+        endpoint=f"https://{storage_account}.blob.{cloudConfig['storageEndpointSuffix']}",
         container=storage_container,
         account=storage_account,
         credential=storage_creds,
@@ -190,7 +192,7 @@ def setup_file_processors(
             azure_credential if document_intelligence_key is None else AzureKeyCredential(document_intelligence_key)
         )
         doc_int_parser = DocumentAnalysisParser(
-            endpoint=f"https://{document_intelligence_service}.cognitiveservices.azure.us/",
+            endpoint=f"https://{document_intelligence_service}.{cloudConfig['cognitiveServicesEndpointSuffix']}/",
             credential=documentintelligence_creds,
             use_content_understanding=use_content_understanding,
             content_understanding_endpoint=content_understanding_endpoint,
@@ -251,7 +253,7 @@ def setup_image_embeddings_service(
             raise ValueError("A computer vision endpoint is required when GPT-4-vision is enabled.")
         image_embeddings_service = ImageEmbeddings(
             endpoint=vision_endpoint,
-            token_provider=get_bearer_token_provider(azure_credential, "https://cognitiveservices.azure.us/.default"),
+            token_provider=get_bearer_token_provider(azure_credential, f"https://{cloudConfig['cognitiveServicesEndpointSuffix']}/.default"),
         )
     return image_embeddings_service
 

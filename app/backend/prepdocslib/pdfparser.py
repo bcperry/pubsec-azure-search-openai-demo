@@ -24,20 +24,10 @@ from pypdf import PdfReader
 from .mediadescriber import ContentUnderstandingDescriber
 from .page import Page
 from .parser import Parser
+from core.cloudhelper import CloudConfiguration
+cloudConfig = CloudConfiguration().config
 
 logger = logging.getLogger("scripts")
-
-# Load cloud configuration based on environment
-cloud_config = {}
-if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
-    cloud_config_path = os.path.join(os.path.dirname(__file__), "..", "clouds", "AzureUSGovernment.json")
-    with open(cloud_config_path, 'r') as f:
-        cloud_config = json.load(f)
-else:
-    cloud_config_path = os.path.join(os.path.dirname(__file__), "..", "clouds", "AzureCloud.json")
-    with open(cloud_config_path, 'r') as f:
-        cloud_config = json.load(f)
-
 
 class LocalPdfParser(Parser):
     """
@@ -64,7 +54,7 @@ class AzureGovCredential:
     
     def get_token(self, *scopes, **kwargs):
         # Always use the Azure Government cognitive services scope
-        return self.base_credential.get_token("https://cognitiveservices.azure.us/.default", **kwargs)
+        return self.base_credential.get_token(f"https://{cloudConfig['cognitiveServicesEndpointSuffix']}/.default", **kwargs)
 
 
 class DocumentAnalysisParser(Parser):
@@ -84,7 +74,7 @@ class DocumentAnalysisParser(Parser):
 
         self.model_id = model_id
         self.endpoint = endpoint
-        if os.getenv("AZURE_CLOUD_ENVIRONMENT") == "AzureUSGovernment":
+        if cloudConfig.name == "AzureUSGovernment":
             self.credential = AzureGovCredential(credential) 
         else:
             self.credential = credential
