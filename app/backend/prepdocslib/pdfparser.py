@@ -74,7 +74,7 @@ class DocumentAnalysisParser(Parser):
 
         self.model_id = model_id
         self.endpoint = endpoint
-        if cloudConfig.name == "AzureUSGovernment":
+        if cloudConfig['name'] == "AzureUSGovernment":
             self.credential = AzureGovCredential(credential) 
         else:
             self.credential = credential
