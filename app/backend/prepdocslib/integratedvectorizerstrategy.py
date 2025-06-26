@@ -8,6 +8,8 @@ from azure.search.documents.indexes.models import (
     AzureOpenAIEmbeddingSkill,
     IndexProjectionMode,
     InputFieldMappingEntry,
+    IndexingParameters,
+    IndexingParametersConfiguration,
     OutputFieldMappingEntry,
     SearchIndexer,
     SearchIndexerDataContainer,
@@ -18,6 +20,7 @@ from azure.search.documents.indexes.models import (
     SearchIndexerIndexProjectionsParameters,
     SearchIndexerSkillset,
     SplitSkill,
+    IndexerExecutionEnvironment
 )
 
 from .blobmanager import BlobManager
@@ -25,7 +28,10 @@ from .embeddings import AzureOpenAIEmbeddingService
 from .listfilestrategy import ListFileStrategy
 from .searchmanager import SearchManager
 from .strategy import DocumentAction, SearchInfo, Strategy
+from core.cloudhelper import CloudConfiguration
+import os
 
+cloudConfig = CloudConfiguration().config
 logger = logging.getLogger("scripts")
 
 
@@ -175,12 +181,20 @@ class IntegratedVectorizerStrategy(Strategy):
             await self.blob_manager.remove_blob()
 
         # Create an indexer
+        execution_env = "private" if os.getenv("AZURE_USE_PRIVATE_ENDPOINT", "").lower() == "true" else "standard"
+        
         indexer = SearchIndexer(
             name=self.indexer_name,
             description="Indexer to index documents and generate embeddings",
             skillset_name=self.skillset_name,
             target_index_name=self.search_info.index_name,
             data_source_name=self.data_source_name,
+            parameters=IndexingParameters(configuration=
+                                   IndexingParametersConfiguration(
+                                   execution_environment=execution_env,
+                                   query_timeout=None
+                                   )
+                                   )
         )
 
         indexer_client = self.search_info.create_search_indexer_client()
