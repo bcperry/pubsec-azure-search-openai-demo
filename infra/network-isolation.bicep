@@ -32,24 +32,24 @@ module vnet './core/networking/vnet.bicep' = if (usePrivateEndpoint) {
         name: 'backend-subnet'
         properties: {
           addressPrefix: '10.0.1.0/24'
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
+          privateEndpointNetworkPolicies: 'Disabled'
+          privateLinkServiceNetworkPolicies: 'Disabled'
         }
       }
       {
         name: 'AzureBastionSubnet'
         properties: {
           addressPrefix: '10.0.2.0/24'
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
+          privateEndpointNetworkPolicies: 'Disabled'
+          privateLinkServiceNetworkPolicies: 'Disabled'
         }
       }
       {
         name: 'app-int-subnet'
         properties: {
           addressPrefix: '10.0.3.0/24'
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
+          privateEndpointNetworkPolicies: 'Disabled'
+          privateLinkServiceNetworkPolicies: 'Disabled'
           delegations: [
             {
               id: appServicePlan.id
