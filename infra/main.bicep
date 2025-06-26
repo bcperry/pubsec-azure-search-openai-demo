@@ -1216,7 +1216,7 @@ var otherPrivateEndpointConnections = (usePrivateEndpoint && deploymentTarget ==
       }
       {
         groupId: 'sql'
-        dnsZoneName: 'privatelink.documents.azure.us	'
+        dnsZoneName: 'privatelink.documents.azure.us'
         resourceIds: (useAuthentication && useChatHistoryCosmos) ? [cosmosDb.outputs.resourceId] : []
       }
     ]
