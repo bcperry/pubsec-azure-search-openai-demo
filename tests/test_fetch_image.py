@@ -15,6 +15,9 @@ from core.imageshelper import fetch_image
 
 from .mocks import MockAzureCredential
 
+from core.cloudhelper import CloudConfiguration
+
+cloudConfig = CloudConfiguration().config
 
 @pytest.mark.asyncio
 async def test_content_file(monkeypatch, mock_env, mock_acs_search):

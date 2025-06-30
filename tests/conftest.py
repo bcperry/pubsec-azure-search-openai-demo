@@ -28,9 +28,9 @@ from openai.types.chat.chat_completion import (
 from openai.types.create_embedding_response import Usage
 
 import app
-import core
-from core.authentication import AuthenticationHelper
-from core.cloudhelper import CloudConfiguration
+from app.backend import core
+from app.backend.core.authentication import AuthenticationHelper
+from app.backend.core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 
 from .mocks import (

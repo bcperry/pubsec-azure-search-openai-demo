@@ -10,6 +10,9 @@ from prepdocslib.listfilestrategy import File
 
 from .mocks import MockAzureCredential
 
+from core.cloudhelper import CloudConfiguration
+
+cloudConfig = CloudConfiguration().config
 
 @pytest.fixture
 def blob_manager(monkeypatch):

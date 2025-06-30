@@ -17,7 +17,7 @@ from ragas.testset import TestsetGenerator
 from ragas.testset.graph import KnowledgeGraph, Node, NodeType
 from ragas.testset.transforms import apply_transforms, default_transforms
 from rich.logging import RichHandler
-from ..app.backend.core.cloudhelper import CloudConfiguration
+from core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 
 logger = logging.getLogger("ragapp")

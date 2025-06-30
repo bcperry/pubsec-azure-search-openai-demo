@@ -10,7 +10,7 @@ from msgraph.generated.models.spa_application import SpaApplication
 from msgraph.generated.models.web_application import WebApplication
 
 from auth_common import get_application, test_authentication_enabled
-from ..app.backend.core.cloudhelper import CloudConfiguration
+from core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 
 async def main():

@@ -7,7 +7,7 @@ import pytest
 from prepdocslib.mediadescriber import ContentUnderstandingDescriber
 
 from .mocks import MockAzureCredential, MockResponse
-from ..app.backend.core.cloudhelper import CloudConfiguration
+from core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 
 @pytest.mark.asyncio

@@ -12,10 +12,10 @@ from azure.search.documents.indexes.models import SearchField, SearchIndex
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from core.authentication import AuthenticationHelper, AuthError
-from ..app.backend.core.cloudhelper import CloudConfiguration
-
 from .mocks import MockAsyncPageIterator, MockResponse
+
+from core.authentication import AuthenticationHelper, AuthError
+from core.cloudhelper import CloudConfiguration
 
 cloudConfig = CloudConfiguration().config
 

@@ -18,7 +18,7 @@ from prepdocslib.listfilestrategy import File
 from prepdocslib.searchmanager import SearchManager, Section
 from prepdocslib.strategy import SearchInfo
 from prepdocslib.textsplitter import SplitPage
-from ..app.backend.core.cloudhelper import CloudConfiguration
+from core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 from .mocks import (
     MOCK_EMBEDDING_DIMENSIONS,

@@ -17,6 +17,10 @@ from config import (
 from decorators import authenticated
 from error import error_response
 
+from core.cloudhelper import CloudConfiguration
+
+cloudConfig = CloudConfiguration().config
+
 chat_history_cosmosdb_bp = Blueprint("chat_history_cosmos", __name__, static_folder="static")
 
 

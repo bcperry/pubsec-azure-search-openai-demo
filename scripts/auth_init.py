@@ -24,7 +24,7 @@ from msgraph.generated.models.web_application import WebApplication
 
 from auth_common import get_application, test_authentication_enabled
 from load_azd_env import load_azd_env
-from ..app.backend.core.cloudhelper import CloudConfiguration
+from core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 
 

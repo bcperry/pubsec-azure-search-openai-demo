@@ -16,7 +16,7 @@ from quart.datastructures import FileStorage
 from prepdocslib.embeddings import AzureOpenAIEmbeddingService
 
 from .mocks import MockClient, MockEmbeddingsClient
-from ..app.backend.core.cloudhelper import CloudConfiguration
+from core.cloudhelper import CloudConfiguration
 cloudConfig = CloudConfiguration().config
 
 # parameterize for directory existing or not

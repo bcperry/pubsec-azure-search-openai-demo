@@ -11,7 +11,9 @@ from azure.search.documents.indexes.models import (
 
 from .mocks import MockAzureCredential
 from scripts.manageacl import ManageAcl
+from core.cloudhelper import CloudConfiguration
 
+cloudConfig = CloudConfiguration().config
 
 class AsyncSearchResultsIterator:
     def __init__(self, results):
@@ -32,7 +34,7 @@ class AsyncSearchResultsIterator:
 @pytest.mark.asyncio
 async def test_view_acl(monkeypatch, capsys):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == f"storageUrl eq `https://test.blob.{cloudConfig['storageEndpointSuffix']}/content/a.txt`"
+        assert kwargs.get("filter") == f"storageUrl eq 'https://test.blob.{cloudConfig["storageEndpointSuffix"]}/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator([{"oids": ["OID_ACL"]}])
 
@@ -55,7 +57,7 @@ async def test_view_acl(monkeypatch, capsys):
 @pytest.mark.asyncio
 async def test_remove_acl(monkeypatch, capsys):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == f"storageUrl eq `https://test.blob.{cloudConfig['storageEndpointSuffix']}/content/a.txt`"
+        assert kwargs.get("filter") == f"storageUrl eq 'https://test.blob.{cloudConfig["storageEndpointSuffix"]}/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator(
             [
@@ -89,7 +91,7 @@ async def test_remove_acl(monkeypatch, capsys):
 @pytest.mark.asyncio
 async def test_remove_all_acl(monkeypatch, capsys):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == f"storageUrl eq `https://test.blob.{cloudConfig['storageEndpointSuffix']}/content/a.txt`"
+        assert kwargs.get("filter") == f"storageUrl eq 'https://test.blob.{cloudConfig["storageEndpointSuffix"]}/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator(
             [
@@ -123,7 +125,7 @@ async def test_remove_all_acl(monkeypatch, capsys):
 @pytest.mark.asyncio
 async def test_add_acl(monkeypatch, caplog):
     async def mock_search(self, *args, **kwargs):
-        assert kwargs.get("filter") == f"storageUrl eq `https://test.blob.{cloudConfig['storageEndpointSuffix']}/content/a.txt`"
+        assert kwargs.get("filter") == f"storageUrl eq 'https://test.blob.{cloudConfig["storageEndpointSuffix"]}/content/a.txt'"
         assert kwargs.get("select") == ["id", "oids"]
         return AsyncSearchResultsIterator([{"id": 1, "oids": ["OID_EXISTS"]}, {"id": 2, "oids": ["OID_EXISTS"]}])
 

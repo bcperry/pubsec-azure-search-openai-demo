@@ -9,6 +9,10 @@ from openai.types.chat import ChatCompletion
 from approaches.chatreadretrieveread import ChatReadRetrieveReadApproach
 from approaches.promptmanager import PromptyManager
 
+from core.cloudhelper import CloudConfiguration
+
+cloudConfig = CloudConfiguration().config
+
 from .mocks import (
     MOCK_EMBEDDING_DIMENSIONS,
     MOCK_EMBEDDING_MODEL_NAME,

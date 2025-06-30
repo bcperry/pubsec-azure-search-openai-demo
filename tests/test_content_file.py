@@ -16,6 +16,10 @@ import app
 
 from .mocks import MockAzureCredential, MockBlob
 
+from core.cloudhelper import CloudConfiguration
+
+cloudConfig = CloudConfiguration().config
+
 
 class MockAiohttpClientResponse404(aiohttp.ClientResponse):
     def __init__(self, url, body_bytes, headers=None):
