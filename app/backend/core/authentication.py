@@ -56,7 +56,7 @@ class AuthenticationHelper:
         # Depending on if requestedAccessTokenVersion is 1 or 2, the issuer and audience of the token may be different
         # See https://learn.microsoft.com/graph/api/resources/apiapplication
         self.valid_issuers = [
-            f"https://sts.windows.net/{tenant_id}/",
+            f"https://{cloudConfig['stsIssuerDomain']}/{tenant_id}/",
             f"{cloudConfig['entraIdAuthEndpoint']}/{tenant_id}/v2.0",
         ]
         self.valid_audiences = [f"api://{server_app_id}", str(server_app_id)]

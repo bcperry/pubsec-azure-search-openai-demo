@@ -2,6 +2,7 @@
   "environments": {
     "AzureUSGovernment": {
         "name": "AzureUSGovernment",
+        "stsIssuerDomain": "login.microsoftonline.us",
         "azureSearchEndpointSuffix": "search.azure.us",
         "cognitiveServicesEndpointSuffix": "cognitiveservices.azure.us",
         "cosmosEndpointSuffix": "documents.azure.us",
@@ -12,6 +13,7 @@
     },
     "AzurePublic": {
         "name": "AzurePublic",
+        "stsIssuerDomain": "sts.windows.net",
         "azureSearchEndpointSuffix": "search.windows.net",
         "cognitiveServicesEndpointSuffix": "cognitiveservices.azure.com",
         "cosmosEndpointSuffix": "documents.azure.com",
@@ -22,6 +24,7 @@
     },
     "AzureChina": {
         "name": "AzureChina",
+        "stsIssuerDomain": "TODO: Add Azure China stsIssuerDomain",
         "azureSearchEndpointSuffix": "search.azure.cn",
         "cognitiveServicesEndpointSuffix": "cognitiveservices.azure.cn",
         "cosmosEndpointSuffix": "documents.azure.cn",
